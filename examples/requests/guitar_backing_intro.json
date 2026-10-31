@@ -1,0 +1,11 @@
+{
+  "instrument": "guitar",
+  "guitar_role": "backing",
+  "section": "intro",
+  "tempo": 160,
+  "bars": 8,
+  "time_signature": [4, 4],
+  "style": ["metalcore"],
+  "sync_to_drums": "output/drums_intro_160bpm_8bars.mid",
+  "seed": 42
+}

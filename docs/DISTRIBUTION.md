@@ -47,9 +47,9 @@ python3 -m venv .venv
 .venv/bin/python -m pip install -e '.[audio,dev]'
 ```
 
-MIDIを`data/sources/<instrument>/<genre>/`へ格納します。配布物には素材がないため、
+ドラム等は既存の楽器・ジャンル構造、ギターは`data/sources/guitar/backing/`または`lead/`直下へ格納します。配布物には素材がないため、
 生成には利用者自身のMIDI登録とセクション等のタグ付けが必要です。
-ギターは解析・検索まで対応し、生成は未実装です。
+ギターは解析・検索とドラム同期型バッキング生成に対応しています。リード生成は未実装です。
 
 ```bash
 .venv/bin/midi-generator catalog scan
@@ -62,3 +62,7 @@ MIDIを`data/sources/<instrument>/<genre>/`へ格納します。配布物には�
 CLIはカレントディレクトリをプロジェクトルートとして使います。展開したルートから
 実行するか、対応コマンドの`--project-root`等で指定してください。
 `.venv/`はコピーせず、必ず展開先で作成してください。
+
+
+ギターのジャンル・セクションはタグで管理します。配布時にはギターのジャンル階層を作成しません。
+既存の素材を配置し直す場合、スキャンより先に[ギター参照更新](GUITAR_SOURCE_MIGRATION.md)を行ってください。

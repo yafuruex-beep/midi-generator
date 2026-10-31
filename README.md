@@ -4,7 +4,7 @@ Independent, reusable MIDI pattern generation framework for metalcore, hardcore,
 
 ## Current status
 
-The project includes MIDI inspection/cataloging, manual pattern tags, catalog search/ranking, template-based drum generation, and optional read-only reference audio rhythm analysis. Pattern segmentation, advanced composition, and reference-driven MIDI generation remain planned.
+The project includes MIDI inspection/cataloging, manual pattern tags, catalog search/ranking, template-based drum generation, drum-synchronized backing guitar generation, and optional read-only reference audio rhythm analysis. Pattern segmentation, advanced composition, and reference-driven MIDI generation remain planned.
 
 ## Terminal-only usage
 
@@ -59,7 +59,7 @@ editable hook, and `MANIFEST.in` includes this backend in source distributions.
 
 ## Current scope
 
-The package provides shared request/result models, MIDI inspection and load/save helpers, catalog management, pattern tagging/search, and template-based drum generation. General MIDI export helpers refuse to replace existing destinations unless overwrite is explicitly requested; generation instead chooses a free numbered filename.
+The package provides shared request/result models, MIDI inspection and load/save helpers, catalog management, pattern tagging/search, template-based drum generation, and drum-synchronized backing guitar generation. General MIDI export helpers refuse to replace existing destinations unless overwrite is explicitly requested; generation instead chooses a free numbered filename.
 
 ```bash
 midi-generator inspect input.mid
@@ -150,7 +150,11 @@ print(render_drum_analysis_report(report))
 
 ## Instrument-organized MIDI sources
 
-Sources live under `data/sources/<instrument>/<genre>/`; files without a verified instrument stay under `data/sources/unclassified/`. Instrument is derived from this path and is kept separate from manual tags. Standard MIDI channels are configurable in `config/instrument_channels.json` (drums 10, guitar 1, bass 2, synth 3).
+Drums and other existing instruments keep their genre layouts. Guitar uses only
+`data/sources/guitar/backing/` and `data/sources/guitar/lead/` directly; guitar
+genres and sections are catalog tags. Legacy guitar paths remain readable with
+`guitar_role: null`. See [safe guitar placement and reconciliation](docs/GUITAR_SOURCE_MIGRATION.md).
+Files without a verified instrument retain the existing global `data/sources/unclassified/` compatibility path. Instrument is derived from this path and is kept separate from manual tags. Standard MIDI channels are configurable in `config/instrument_channels.json` (drums 10, guitar 1, bass 2, synth 3).
 
 ```bash
 midi-generator source list
@@ -263,7 +267,7 @@ result = generate({
 print(result.output_files)
 ```
 
-`GenerationRequest` is the shared generation input model. Pattern segmentation, advanced drum composition, other instrument generators, and reference-driven MIDI generation remain planned.
+`GenerationRequest` is the shared generation input model. Pattern segmentation, advanced drum composition, lead/bass/synth generation, and reference-driven MIDI generation remain planned.
 
 ## Reference audio analysis (Phase 5.1)
 
@@ -302,8 +306,8 @@ features for pattern search/selection. JSON Schema: `schemas/reference_analysis.
 ## Guitar riff analysis (Phase 6.1)
 
 Read-only guitar pitch, interval polyphony, rhythm, duration/rest, chord-structure,
-and bar-repetition analysis is available through CLI and API. Guitar generation
-remains planned. Reports are independent of the main catalog and manual tags.
+and bar-repetition analysis is available through CLI and API. Phase 6.2-A adds
+drum-synchronized backing generation; lead generation remains planned. Reports are independent of the main catalog and manual tags.
 
 ```bash
 midi-generator catalog analyze-guitars
@@ -314,3 +318,37 @@ midi-generator search --instrument guitar --riff-characteristic tremolo_like
 See [guitar analysis/API, thresholds and limitations](docs/GUITAR_RIFFS.md).
 The current 99 guitar assets contain possible articulation/control keys; these
 are retained and flagged, so pitch/chord classifications require mapping review.
+
+
+## Backing guitar generation (Phase 6.2-A)
+
+Select an existing section/style-tagged guitar riff by its rhythm fit to an existing
+drum MIDI. Pitch, velocity, chord structure and onset ticks stay intact; complete
+source phrases are looped or trimmed. No lead generation or active rhythm editing.
+
+```bash
+midi-generator generate --config examples/requests/guitar_backing_intro.json --output output/my_backing.mid
+```
+
+The referenced drum must exist and match the requested BPM/meter. Sources need
+section/style annotations and fresh Phase 6.1 analysis. Formal source roles use only the direct `guitar/backing/` and `guitar/lead/`
+folders. The accepted generation prototype still has its earlier warned role
+heuristics; these do not establish the formal catalog attribute. See
+[Phase 6.1.1 source management](docs/GUITAR_SOURCE_MIGRATION.md) before relocating assets. Filenames have no required naming convention. See the
+[backing guide and scoring/API details](docs/GUITAR_BACKING.md).
+
+
+## Formal guitar roles and manual relocation (Phase 6.1.1)
+
+```bash
+midi-generator search --instrument guitar --guitar-role backing
+midi-generator search --instrument guitar --guitar-role lead
+midi-generator source reconcile-guitars --dry-run
+```
+
+Role searches exclude unclassified legacy sources and ignore filename, musical
+feature and free-tag guesses. After manual placement, reconcile references before
+rescanning. Stable IDs, tags and hash-verified riff features are preserved;
+ambiguous matches block every update. Explicit apply backs up both JSON files and
+uses a recoverable journal/lock transaction. MIDI is never moved by this tool.
+CLI/API/recovery: [guitar source migration guide](docs/GUITAR_SOURCE_MIGRATION.md).

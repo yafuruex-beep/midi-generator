@@ -20,8 +20,11 @@ def test_release_contains_installable_sources_and_no_local_assets(tmp_path):
         names = {name.removeprefix("midi-generator/") for name in archive.namelist()}
         assert {"pyproject.toml", "build_support/editable_backend.py", "src/midi_generator/__init__.py",
                 "scripts/package_release.py", "tests/test_release_layout.py",
-                "examples/requests/drums_breakdown.json", "config/guitar_analysis.json",
-                "data/sources/drums/metalcore/.gitkeep", "data/references/.gitkeep"} <= names
+                "examples/requests/drums_breakdown.json", "examples/requests/guitar_backing_intro.json",
+                "config/guitar_analysis.json", "config/guitar_sync.json",
+                "data/sources/drums/metalcore/.gitkeep", "data/sources/guitar/backing/.gitkeep",
+                "data/sources/guitar/lead/.gitkeep", "data/references/.gitkeep"} <= names
+        assert not any(name.startswith(("data/sources/guitar/metalcore/", "data/sources/guitar/hardcore/", "data/sources/guitar/backing/metalcore/")) for name in names)
         assert not any(name.endswith((".mid", ".midi", ".mp3", ".wav", ".flac")) for name in names)
         assert not any(name.startswith((".venv", "build/", "configs/")) or "egg-info" in name for name in names)
         assert not any(name.startswith(("data/", "output/")) and not name.endswith("/.gitkeep") for name in names)

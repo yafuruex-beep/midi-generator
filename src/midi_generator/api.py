@@ -30,6 +30,7 @@ from midi_generator.storage.drum_grooves import analyze_catalog_grooves, get_dru
 from midi_generator.reference_analysis import analyze_reference_audio, save_reference_analysis
 from midi_generator.modules.guitar import analyze_guitar_midi
 from midi_generator.storage.guitar_riffs import analyze_catalog_guitars, get_guitar_riff_analysis, search_guitar_riffs
+from midi_generator.storage.guitar_migration import reconcile_guitar_sources, recover_guitar_references
 
 
 def inspect(path: str | Path) -> dict[str, Any]:
@@ -49,11 +50,20 @@ def generate(
     catalog_path: str | Path = "data/catalog/midi_catalog.json",
     project_root: str | Path = ".",
     groove_analysis_path: str | Path | None = None,
+    guitar_analysis_path: str | Path | None = None,
+    guitar_sync_config_path: str | Path | None = None,
 ) -> GenerationResult:
     """Generate a MIDI asset through the shared template-based instrument engine."""
     validated = request if isinstance(request, GenerationRequest) else GenerationRequest.from_dict(request)
+    if validated.instrument.lower() == "guitar":
+        from midi_generator.modules.guitar.backing import generate_backing_guitar
+        return generate_backing_guitar(validated, output_path=output_path, catalog_path=catalog_path,
+                                       project_root=project_root, guitar_analysis_path=guitar_analysis_path,
+                                       sync_config_path=guitar_sync_config_path)
     if validated.instrument.lower() != "drums":
         raise ValueError("The current generator supports instrument='drums' only")
+    if any(key in validated.options for key in ("guitar_role", "sync_to_drums")):
+        raise ValueError("guitar_role and sync_to_drums are only supported for instrument='guitar'")
     return generate_drums(validated, output_path=output_path, catalog_path=catalog_path,
                           project_root=project_root, groove_analysis_path=groove_analysis_path)
 
@@ -61,6 +71,8 @@ def generate(
 __all__ = [
     "GenerationRequest",
     "GenerationResult",
+    "reconcile_guitar_sources",
+    "recover_guitar_references",
     "analyze_guitar_midi",
     "analyze_catalog_guitars",
     "get_guitar_riff_analysis",

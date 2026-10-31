@@ -13,7 +13,7 @@
 - [x] Implement catalog tagging and pattern search/ranking.
 - [ ] Implement pattern segmentation and MIDI transformation.
 - [x] Implement template-based drum generator.
-- [ ] Implement guitar generator.
+- [x] Implement drum-synchronized backing guitar generation; lead remains planned.
 - [ ] Implement reference-audio feature analysis.
 - [ ] Implement bass and synth generators.
 
@@ -274,3 +274,130 @@ Verification: `data/reports/layout_refactor_verification.json`.
 Backup: `data/backups/layout-refactor-20261031T061801353442Z/`.
 The project code license is not yet specified; an owner-selected license should
 be added before public distribution. No musical algorithms or CLI behavior changed.
+
+
+## Phase 6.2-A: Drum-synchronized backing guitar generation
+
+Accepted drum generation, drum groove analysis, guitar riff analysis and reference
+audio algorithms remain unchanged. No original MIDI, production catalog, manual
+tag, source ID, or existing analysis report was modified.
+
+- Added a backing-only generation engine using existing catalog mandatory filters,
+  Phase 6.1 source hashes/features and the existing MIDI timeline/note pairing.
+- Added configurable kick-first precision/recall, grid, syncopation, sounding-rest,
+  snare-accent and repetition scores. Chords count as one rhythmic attack.
+- Added phrase-length ranking, deterministic seeded selection within a top-score
+  band, whole-source looping/trimming, boundary releases, preserved pitch/velocity/
+  controls/track count, fixed target tempo/meter and guitar channel 1 by default.
+- Added `--guitar-role`, `--sync-to-drums`, `--guitar-analysis` on generation and
+  `--guitar-sync-config`, shared by CLI/API. Two request JSON aliases normalize
+  into existing `options`; existing direct request fields are unchanged.
+- Explicit backing/lead roles use tags or optional instrument/genre/role folders.
+  Filenames are not a generation requirement. Unknown roles remain warned,
+  unverified candidates; explicit lead/conflicting roles are excluded.
+- Added provenance sidecars, strict finite JSON, no-overwrite export, generic
+  request example, source-ZIP inclusion and terminal/API documentation.
+
+Full verification: **168 passed in 5.72s** (125 existing + 43 guitar generation
+cases). Baseline before changes: 125 passed in 4.24s. Synthetic tests cover TPB
+normalization, non-4/4 meters, exact/dense rhythms, rests, chords, role separation,
+phrase fit, note pairing/retriggers, controller order, configurable selection,
+CLI/API equality, seeded stability and input/output protection.
+
+Real validation used 39 user-directed `Riff`-named guitar sources and
+`output/drums_intro_160bpm_8bars.mid`. Naming was only a user-specified validation
+scope, not a program rule. Because no intro definitions existed, a separate
+`data/cache/phase62_guitar_validation_catalog.json` holds the provisional intro
+context; the production catalog retains all original tags. 37 candidates were
+usable; two were excluded for insufficient straight-grid alignment.
+
+Selected: `data/sources/guitar/LFUMMG_Riff_22_186_Wet_MIDI_G.mid`.
+Output: `output/guitar_backing_intro.mid` and adjacent `.mid.json`.
+Both drum and guitar are 160 BPM, 4/4, eight bars, 12 seconds. The guitar retains
+all 76 source notes with identical onset/end ticks, pitches, velocities, channels
+and track positions. Source length is exactly eight bars, so no phrase was cut.
+CLI/API repeated generation produced identical MIDI bytes and synchronization
+metrics. All 357 protected file hashes matched, including the 324 source MIDI,
+existing generated drums, production catalogs/reports and frozen implementations.
+
+| Actual metric | Value |
+|---|---:|
+| Overall sync score | 0.561416 |
+| Kick coverage | 13/16 = 0.8125 |
+| Guitar attack precision | 13/38 = 0.342105 |
+| Kick alignment component | 0.547612 |
+| Grid match | 0.740741 |
+| Syncopation match | 0.454545 |
+| Rest compatibility | 0.438596 |
+| Snare accent relation | 0.805455 |
+| Repetition match | 0.607143 |
+
+The fit is moderate, not a promise of complete musical synchronization. The drum
+contains one off-grid snare ornament retained at its actual time. The source has
+possible articulation keys that were retained. Actual backing role remains
+unverified. DAW audition was not performed. Phase 6.2-B may add active rhythmic
+editing; lead, transpose, chord/tuning conversion and AI composition remain out
+of scope.
+
+Guide: `docs/GUITAR_BACKING.md`.
+Full checks/file inventory: `data/reports/phase62a_verification_report.json`.
+
+
+## Phase 6.1.1: Formal guitar role folders and safe reference updates
+
+This source-management milestone follows acceptance of the Phase 6.2-A prototype.
+The prototype remains present and unchanged; no generation/synchronization or
+musical-analysis algorithms were added or altered in this milestone.
+
+- Formal guitar roles come only from direct `data/sources/guitar/backing/` or
+  `lead/` file placement. Genres/sections remain catalog tags. Filename, channel,
+  free-tag and musical-feature guesses never establish the formal attribute.
+- Old genre layouts and flat guitar files remain readable with an effective null
+  role. Existing old empty directories are retained, but new scaffolding and
+  source distributions create only backing/lead guitar role directories.
+- Added strict `search --guitar-role backing|lead` and shared API filtering;
+  omission retains previous retrieval/ranking. Optional role metadata extends
+  catalog batch reports and the backward-compatible guitar JSON Schema.
+- Added read-only `source reconcile-guitars --dry-run`, backed-up `--apply`,
+  explicit ID/path `--mapping`, and verified `--recover`. No MIDI is moved.
+- Relocation preserves original file_id/source_id, manual tags, provenance,
+  unknown user attributes, legacy genre/history, and hash-verified riff features.
+  Duplicate-content identities need explicit mapping; registered records are
+  never merged, and any unresolved condition blocks the entire update.
+- Apply uses verified before-images, atomic per-file replacement, complete-owner
+  exclusive locks, a recovery journal, content checks and rollback. This is a
+  recoverable multi-file update, not a single filesystem transaction. Recovery
+  refuses later user edits, tampered backups and live/conflicting writers.
+- Catalog scans preserve migration history and refuse detectable unreconciled
+  moves or reused stable IDs. Generic source migration no longer moves guitars
+  into genre folders; one old test expectation was changed to enforce this rule.
+
+Baseline: **168 passed in 5.00s**. Final: **208 passed in 5.56s**, including 40 new
+migration/classification cases and all drum, guitar-analysis, guitar-prototype and
+reference-audio regressions. Tests used generated MIDI in temporary directories.
+Failure injection covered rollback, failed rollback, abrupt interruption,
+recovery retry, edited metadata, source changes, and ambiguous identical content.
+
+Actual-source dry-run inspected 99 guitar records and confirmed all 99 existing
+identity/content mappings: **0 changes, 0 integrity issues, 0 source ID changes**.
+All 99 MIDI remain directly under `data/sources/guitar/`; legacy genre folders
+contain no MIDI. Formal roles: backing 0, lead 0, unclassified 99. One identical-
+content group contains two distinct sources; they were not merged.
+
+Only the two empty formal role directories were added. Real MIDI moves: **0**;
+real metadata apply: **not executed**. All 369 protected original hashes matched,
+including source MIDI, original catalogs/reports, accepted generated MIDI and
+frozen generation/analysis modules. Guitar-role searches correctly returned 0/0,
+ordinary guitar search 99, drum search 225. Existing riff JSON still validates
+without the optional new role property.
+
+Guide: `docs/GUITAR_SOURCE_MIGRATION.md`.
+Verification/file inventory: `data/reports/phase611_verification_report.json`.
+Update backups are created only on apply under
+`data/backups/guitar-reference-update-<UTC timestamp>/`; actual dry-run made none.
+
+Next: users decide and place backing/lead sources, reconcile ID/path/hash
+references, and verify style/section tags. Formal generation integration should
+then restrict retrieval to verified backing-folder records and be auditioned;
+the existing prototype's warned role heuristics are not the formal source label.
+Historical generation sidecars and temporary validation catalogs are not rewritten.

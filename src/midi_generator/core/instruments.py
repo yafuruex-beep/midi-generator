@@ -42,11 +42,13 @@ def classify_source_path(relative_path: str | Path) -> dict[str, str | None]:
         return {"instrument": None, "source_directory": "data/sources/unclassified", "genre_directory": None}
     if instrument not in INSTRUMENTS - {"other"}:
         return {"instrument": None, "source_directory": f"data/sources/{parts[2]}", "genre_directory": None}
-    genre = parts[3].lower() if len(parts) > 3 else None
+    genre = parts[3].lower() if len(parts) > 4 else None
+    role = genre if instrument == "guitar" and genre in {"backing", "lead"} and len(parts) == 5 else None
     return {
         "instrument": instrument,
         "source_directory": f"data/sources/{parts[2]}",
         "genre_directory": genre if genre in GENRES else None,
+        **({"guitar_role": role} if instrument == "guitar" else {}),
     }
 
 

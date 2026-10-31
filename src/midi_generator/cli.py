@@ -16,6 +16,7 @@ from midi_generator.storage.patterns import add_tags, get_tags, remove_tags, sea
 from midi_generator.modules.drums.groove import GROOVE_VALUES
 from midi_generator.storage.drum_grooves import analyze_catalog_grooves
 from midi_generator.storage.guitar_riffs import analyze_catalog_guitars
+from midi_generator.storage.guitar_migration import reconcile_guitar_sources, recover_guitar_references
 from midi_generator.storage.sources import (
     correct_source_channels,
     inspect_sources,
@@ -104,6 +105,16 @@ def build_parser() -> argparse.ArgumentParser:
 
     source_parser = subparsers.add_parser("source", help="Manage instrument-organized MIDI sources")
     source_subparsers = source_parser.add_subparsers(dest="source_command", required=True)
+    reconcile_parser = source_subparsers.add_parser("reconcile-guitars", help="Reconcile manually moved guitar references; never move MIDI")
+    reconcile_mode = reconcile_parser.add_mutually_exclusive_group()
+    reconcile_mode.add_argument("--dry-run", action="store_true", help="Read-only preview (default)")
+    reconcile_mode.add_argument("--apply", action="store_true", help="Back up and update unambiguous JSON references")
+    reconcile_mode.add_argument("--recover", metavar="BACKUP_DIRECTORY", help="Restore verified metadata before-images from a transaction backup")
+    reconcile_parser.add_argument("--project-root", default=".")
+    reconcile_parser.add_argument("--catalog", default="data/catalog/midi_catalog.json")
+    reconcile_parser.add_argument("--analysis", default="data/catalog/guitar_riff_analysis.json")
+    reconcile_parser.add_argument("--mapping", help="JSON object: existing source_id to manually verified new relative path")
+    reconcile_parser.add_argument("--backup-directory", default="data/backups")
     source_list_parser = source_subparsers.add_parser("list", help="List source MIDI files and channel status")
     source_inspect_parser = source_subparsers.add_parser("inspect", help="Inspect sources, optionally by instrument")
     source_inspect_parser.add_argument("--instrument", choices=("drums", "guitar", "bass", "synth"))
@@ -150,6 +161,7 @@ def build_parser() -> argparse.ArgumentParser:
     remove_parser.add_argument("--catalog", default="data/catalog/midi_catalog.json")
 
     search_parser = subparsers.add_parser("search", help="Search and rank catalog patterns")
+    search_parser.add_argument("--guitar-role", choices=("backing", "lead"), help="Formal guitar role from guitar/backing or guitar/lead only")
     search_parser.add_argument("--riff-characteristic", dest="riff_characteristics", action="append", metavar="LABEL",
                                help="Required guitar riff label; repeat or use commas for multiple labels (AND)")
     search_parser.add_argument("--guitar-analysis", help="Independent guitar riff report JSON")
@@ -179,7 +191,11 @@ def build_parser() -> argparse.ArgumentParser:
     generate_parser.add_argument("--style", help="Comma-separated genre tags")
     generate_parser.add_argument("--tags", help="Comma-separated required pattern tags")
     generate_parser.add_argument("--seed", type=int)
-    generate_parser.add_argument("--midi-channel", type=int, help="One-based MIDI channel, default 10")
+    generate_parser.add_argument("--guitar-role", help="Guitar role: backing supported; lead is not implemented")
+    generate_parser.add_argument("--sync-to-drums", help="Existing drum MIDI used as a guitar rhythm reference")
+    generate_parser.add_argument("--guitar-analysis", help="Independent Phase 6.1 guitar analysis JSON")
+    generate_parser.add_argument("--guitar-sync-config", help="Guitar synchronization weights/settings JSON")
+    generate_parser.add_argument("--midi-channel", type=int, help="One-based MIDI channel; drums default 10, guitar backing default 1")
     generate_parser.add_argument("--output", help="Output MIDI path; defaults to a descriptive path in output/")
     generate_parser.add_argument("--catalog", default="data/catalog/midi_catalog.json")
     generate_parser.add_argument("--project-root", default=".")
@@ -260,6 +276,16 @@ def main() -> None:
                     "output_file": report["output_file"],
                     "csv_file": report.get("csv_file"),
                 }, ensure_ascii=False, indent=2))
+        elif args.command == "source" and args.source_command == "reconcile-guitars":
+            if args.recover:
+                result = recover_guitar_references(args.recover, project_root=args.project_root)
+            else:
+                mapping = None
+                if args.mapping:
+                    mapping = json.loads((Path(args.project_root) / args.mapping).read_text(encoding="utf-8"))
+                result = reconcile_guitar_sources(project_root=args.project_root, catalog_path=args.catalog,
+                    analysis_path=args.analysis, mapping=mapping, apply=args.apply, backup_directory=args.backup_directory)
+            print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
         elif args.command == "source":
             common = {"source_dir": args.source_dir, "project_root": args.project_root, "config_path": args.config}
             if args.source_command == "list":
@@ -317,6 +343,7 @@ def main() -> None:
                 groove_analysis_path=args.groove_analysis,
                 riff_characteristics=args.riff_characteristics,
                 guitar_analysis_path=args.guitar_analysis,
+                guitar_role=args.guitar_role,
             )
             print(json.dumps(results, ensure_ascii=False, indent=2))
         elif args.command == "generate":
@@ -327,7 +354,7 @@ def main() -> None:
                     raise ValueError("Generation config must contain a JSON object")
             else:
                 request_data = {}
-            for name in ("instrument", "section", "tempo", "bars", "seed"):
+            for name in ("instrument", "section", "tempo", "bars", "seed", "guitar_role", "sync_to_drums"):
                 value = getattr(args, name)
                 if value is not None:
                     request_data[name] = value
@@ -356,6 +383,8 @@ def main() -> None:
                 catalog_path=args.catalog,
                 project_root=args.project_root,
                 groove_analysis_path=args.groove_analysis,
+                guitar_analysis_path=args.guitar_analysis,
+                guitar_sync_config_path=args.guitar_sync_config,
             )
             print(json.dumps({
                 "output_files": [str(path) for path in result.output_files],

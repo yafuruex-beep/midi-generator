@@ -7,14 +7,13 @@ import tomllib
 import zipfile
 
 ROOT_FILES = ("README.md", "AGENTS.md", "pyproject.toml", "MANIFEST.in", ".gitignore", "LICENSE", "LICENSE.txt")
-CONFIG_FILES = ("drum_groove.json", "guitar_analysis.json", "instrument_channels.json")
+CONFIG_FILES = ("drum_groove.json", "guitar_analysis.json", "guitar_sync.json", "instrument_channels.json")
 SOURCE_TREES = {"src/midi_generator": ".py", "tests": ".py", "build_support": ".py",
                 "scripts": ".py", "docs": ".md", "schemas": ".json"}
 EMPTY_DIRECTORIES = ("data/catalog", "data/cache", "data/references", "data/reports",
                      "data/backups", "data/archive", "data/sources/drums/metalcore",
                      "data/sources/drums/hardcore", "data/sources/drums/other",
-                     "data/sources/guitar/metalcore", "data/sources/guitar/hardcore",
-                     "data/sources/guitar/other", "data/sources/bass/metalcore",
+                     "data/sources/guitar/backing", "data/sources/guitar/lead", "data/sources/bass/metalcore",
                      "data/sources/bass/other", "data/sources/synth/metalcore",
                      "data/sources/synth/other", "data/sources/unclassified", "output")
 
@@ -31,6 +30,7 @@ def build_release(root, destination):
     files.update(root / "config" / name for name in CONFIG_FILES)
     files.add(root / "examples/python_api_example.py")
     files.add(root / "examples/requests/drums_breakdown.json")
+    files.add(root / "examples/requests/guitar_backing_intro.json")
     contents = {}
     for path in sorted(files):
         if path.is_symlink() or not path.resolve().is_relative_to(root):

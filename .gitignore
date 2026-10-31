@@ -33,3 +33,17 @@ data/backups/
 *.pem
 *.key
 .ssh/
+
+# Empty official guitar role directories only
+!data/sources/guitar/
+data/sources/guitar/*
+!data/sources/guitar/backing/
+data/sources/guitar/backing/*
+!data/sources/guitar/backing/.gitkeep
+!data/sources/guitar/lead/
+data/sources/guitar/lead/*
+!data/sources/guitar/lead/.gitkeep
+
+# Transient reference-update state
+.guitar-reference-update.lock
+.guitar-reference-*

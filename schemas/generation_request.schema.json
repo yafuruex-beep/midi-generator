@@ -13,6 +13,8 @@
       "type": "integer",
       "const": 1
     },
+    "guitar_role": {"type": "string", "enum": ["backing", "lead"]},
+    "sync_to_drums": {"type": "string", "minLength": 1},
     "instrument": {
       "type": "string",
       "minLength": 1

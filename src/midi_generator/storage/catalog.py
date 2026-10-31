@@ -2,18 +2,20 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import hashlib
 import json
 from pathlib import Path
 import tempfile
 from typing import Any
 
 import mido
-from midi_generator.core.instruments import load_instrument_config, source_channel_metadata
+from midi_generator.core.instruments import classify_source_path, load_instrument_config, source_channel_metadata
 from midi_generator.core.midi_io import analyze_midi_events
 
 
 CATALOG_VERSION = 1
 MIDI_SUFFIXES = {".mid", ".midi"}
+REFERENCE_LOCK = ".guitar-reference-update.lock"
 
 
 def _absolute_events(track: mido.MidiTrack) -> list[tuple[int, mido.Message | mido.MetaMessage]]:
@@ -155,6 +157,7 @@ def analyze_midi(path: str | Path, *, relative_path: str | None = None) -> dict[
 
 
 def _load_catalog(path: Path) -> dict[str, Any]:
+    _assert_reference_unlocked(path)
     if not path.exists():
         return {"catalog_version": CATALOG_VERSION, "scanned_at": None, "files": []}
     with path.open(encoding="utf-8") as catalog_file:
@@ -165,6 +168,7 @@ def _load_catalog(path: Path) -> dict[str, Any]:
 
 
 def _write_catalog(path: Path, catalog: dict[str, Any]) -> None:
+    _assert_reference_unlocked(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary_path: Path | None = None
     try:
@@ -172,10 +176,16 @@ def _write_catalog(path: Path, catalog: dict[str, Any]) -> None:
             temporary_path = Path(output.name)
             json.dump(catalog, output, ensure_ascii=False, indent=2)
             output.write("\n")
+        _assert_reference_unlocked(path)
         temporary_path.replace(path)
     finally:
         if temporary_path is not None and temporary_path.exists():
             temporary_path.unlink()
+
+
+def _assert_reference_unlocked(path: Path) -> None:
+    if (path.parent / REFERENCE_LOCK).exists():
+        raise ValueError("Guitar reference update is locked/incomplete; finish the update or use source reconcile-guitars --recover BACKUP_DIRECTORY")
 
 
 def _catalog_path(source: Path, source_root: Path, project_root: Path) -> str:
@@ -219,6 +229,18 @@ def scan_midi_catalog(
         (path for path in source_root.rglob("*") if path.is_file() and path.suffix.lower() in MIDI_SUFFIXES),
         key=lambda path: path.as_posix().casefold(),
     )
+    missing_guitars = [record for record in old_records.values()
+                       if record.get("present", True) and classify_source_path(record["path"]).get("instrument") == "guitar"
+                       and not (root / record["path"]).is_file()]
+    new_guitars = [path for path in discovered if _catalog_path(path, source_root, root) not in old_records
+                   and classify_source_path(_catalog_path(path, source_root, root)).get("instrument") == "guitar"]
+    if missing_guitars and new_guitars:
+        report_path = catalog_path.parent / "guitar_riff_analysis.json"
+        report = json.loads(report_path.read_text(encoding="utf-8")) if report_path.is_file() else {"sources": []}
+        report_hashes = {entry.get("source_id"): entry.get("source_sha256") for entry in report.get("sources", [])}
+        missing_hashes = {record.get("source_sha256") or report_hashes.get(record.get("file_id", record["path"])) for record in missing_guitars}
+        if any(hashlib.sha256(path.read_bytes()).hexdigest() in missing_hashes for path in new_guitars):
+            raise ValueError("Possible manually relocated guitar sources: run source reconcile-guitars --dry-run before catalog scan; no IDs were reassigned")
     records = dict(old_records)
     for record in records.values():
         record["present"] = False
@@ -235,6 +257,7 @@ def scan_midi_catalog(
                 instrument_channels=instrument_config["standard_channels"],
             )
             records[path_key] = {
+                **previous,
                 "path": path_key,
                 "file_id": previous.get("file_id", path_key),
                 "present": True,
@@ -245,10 +268,12 @@ def scan_midi_catalog(
                 "provenance": previous.get("provenance", {}),
                 "classification_metadata": previous.get("classification_metadata", {}),
                 **source_metadata,
+                **({"source_sha256": hashlib.sha256(midi_path.read_bytes()).hexdigest()} if source_metadata.get("instrument") == "guitar" else {}),
             }
             successful += 1
         except Exception as exc:  # per-file isolation is required for batch scans
             records[path_key] = {
+                **previous,
                 "path": path_key,
                 "file_id": previous.get("file_id", path_key),
                 "present": True,
@@ -276,5 +301,8 @@ def scan_midi_catalog(
         "source_directory": relative_source_directory,
         "files": sorted(records.values(), key=lambda item: item["path"].casefold()),
     }
+    identities = [record.get("file_id", record["path"]) for record in result["files"]]
+    if len(identities) != len(set(identities)):
+        raise ValueError("Source ID collision detected; catalog was not written. Reconcile guitar references before scanning")
     _write_catalog(catalog_path, result)
     return {"catalog_path": str(catalog_path), "scanned": len(discovered), "succeeded": successful, "failed": failed, "catalog": result}

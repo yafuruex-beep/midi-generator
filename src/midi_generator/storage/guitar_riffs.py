@@ -8,7 +8,8 @@ from pathlib import Path
 from midi_generator.modules.guitar.analysis import (
     ANALYSIS_VERSION, RIFF_CHARACTERISTICS, analyze_guitar_midi, load_guitar_config,
 )
-from midi_generator.storage.catalog import _load_catalog, _write_catalog
+from midi_generator.storage.catalog import _assert_reference_unlocked, _load_catalog, _write_catalog
+from midi_generator.core.instruments import classify_source_path
 
 DEFAULT_REPORT = "data/catalog/guitar_riff_analysis.json"
 
@@ -32,7 +33,8 @@ def analyze_catalog_guitars(*, catalog_path="data/catalog/midi_catalog.json", ou
     records = [record for record in catalog["files"] if record.get("present", True) and record.get("instrument") == "guitar"]
     sources = []
     for record in records:
-        base = {"source_id": record.get("file_id", record["path"]), "file_path": record["path"], "instrument": "guitar"}
+        base = {"source_id": record.get("file_id", record["path"]), "file_path": record["path"], "instrument": "guitar",
+                "guitar_role": classify_source_path(record["path"]).get("guitar_role")}
         try:
             path = root / record["path"]
             if not path.is_file() and catalog.get("source_directory"):
@@ -78,6 +80,7 @@ def analyze_catalog_guitars(*, catalog_path="data/catalog/midi_catalog.json", ou
 
 
 def get_guitar_riff_analysis(source_id, *, analysis_path=DEFAULT_REPORT):
+    _assert_reference_unlocked(Path(analysis_path))
     report = json.loads(Path(analysis_path).read_text(encoding="utf-8"))
     matches = [entry for entry in report["sources"] if source_id in {entry["source_id"], entry["file_path"]}]
     if not matches:

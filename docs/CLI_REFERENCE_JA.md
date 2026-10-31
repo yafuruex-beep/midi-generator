@@ -35,7 +35,8 @@
 | ギターの音域・リズム・リフ特性解析と検索 | 対応 |
 | WAV・MP3・FLACの参考音源解析 | audio追加依存関係の導入で対応 |
 | 参考音源を渡すだけで、その音源に合わせたMIDIを自動生成 | 未対応。解析結果を見て、人が生成条件を決める |
-| ギター・ベース・シンセのMIDI生成 | 未対応 |
+| ギターバッキングのMIDI生成 | 生成済みドラムに同期する既存リフの選択方式に対応 |
+| リードギター・ベース・シンセのMIDI生成 | 未対応 |
 | AIによる自動作曲・自動採譜 | 未対応 |
 
 生成には利用者自身のMIDI素材が必要です。配布ZIPにはサンプルパックや参考音源を含めていません。
@@ -127,7 +128,8 @@ midi-generator/
 │   ├── sources/               自分で用意したMIDI素材
 │   │   ├── drums/metalcore/
 │   │   ├── drums/hardcore/
-│   │   ├── guitar/metalcore/
+│   │   ├── guitar/backing/
+│   │   ├── guitar/lead/
 │   │   ├── bass/other/
 │   │   ├── synth/other/
 │   │   └── unclassified/
@@ -142,7 +144,9 @@ midi-generator/
 素材はファイル管理アプリでコピーして構いません。
 楽器は`drums`、`guitar`、`bass`、`synth`などの**フォルダ名**で判定します。
 チャンネル番号から楽器を推測する方式ではありません。
-ジャンルのフォルダ名だけに頼らず、検索・生成で使う`style`はタグとして確認・登録してください。
+ギターはbacking/lead直下だけを正式な役割分類に使います。ギターのジャンル別階層は新設しません。
+ジャンル・セクションはタグで管理します。旧配置のギターは未分類のまま読み込めます。
+他楽器でも、検索・生成で使う`style`はタグとして確認・登録してください。
 
 ## 5. 最初のドラムMIDIを生成する
 
@@ -363,7 +367,9 @@ midi-generator generate --instrument drums --section intro --tempo 120 --bars 8 
 
 ## 10. ギター素材を分析・検索する
 
-素材を`data/sources/guitar/metalcore/`等に格納し、登録・解析します。
+新規素材は自分で役割を決めて`data/sources/guitar/backing/`または`lead/`直下へ格納します。
+既存素材の移動時は、**先に[参照更新](GUITAR_SOURCE_MIGRATION.md)を完了してから**スキャンしてください。
+以下は新規素材を登録・解析する操作です。
 
 ```bash
 midi-generator catalog scan
@@ -390,7 +396,35 @@ midi-generator search --instrument guitar --riff-characteristic tremolo_like --r
 解析JSONは`data/catalog/guitar_riff_analysis.json`です。
 低音の奏法切替キーが演奏ノートに混在する素材では、音域・和音・同時発音の結果に影響します。
 警告を確認し、推定ラベルを確定した奏法・チューニングとして扱わないでください。
-**ギターの生成コマンドは未対応です。** 詳細は[ギター解析ガイド](GUITAR_RIFFS.md)を参照してください。
+解析の詳細は[ギター解析ガイド](GUITAR_RIFFS.md)を参照してください。
+
+### 正式な役割で検索・参照更新する
+
+```bash
+midi-generator search --instrument guitar --guitar-role backing
+midi-generator search --instrument guitar --guitar-role lead
+midi-generator source reconcile-guitars --dry-run
+```
+
+ロール検索はそのフォルダ直下の素材だけを返し、旧配置や自由タグだけの素材を含めません。
+手動で移した後はDry Runを確認してから`source reconcile-guitars --apply`でJSON参照を更新します。
+曖昧な対応は停止し、元MIDIを自動移動しません。[移行・バックアップ・復旧手順](GUITAR_SOURCE_MIGRATION.md)を参照してください。
+
+### ドラム同期型バッキングを生成する
+
+Phase 6.2-Aではバッキング生成に対応しています。リードは未対応です。
+正式なギターロールはbacking/lead直下の配置から取得し、セクション・styleはタグで管理します。
+自由タグやファイル名から正式ロールを確定しません。以下は既存生成プロトタイプの呼び出しです。
+プロトタイプ内部の推定・タグヒントは正式なカタログ分類とは別です。
+
+```bash
+midi-generator generate --instrument guitar --guitar-role backing --section intro --tempo 160 --bars 8 --time-signature 4/4 --style metalcore --sync-to-drums output/drums_intro_160bpm_8bars.mid --seed 42 --output output/guitar_backing_intro.mid
+```
+
+参照ドラムのBPM・拍子は生成指定と一致が必要です。
+キックとの一致、休符、反復、フレーズ長で候補を選び、元の音程・コード構成・アタック位置を保持します。
+完全一致しないリフも選ばれるため、隣の`.mid.json`に記録された同期スコアと警告を確認してください。
+詳しい準備・API・重み設定は[バッキング生成ガイド](GUITAR_BACKING.md)を参照してください。
 
 ## 11. 参考音源を解析する
 
@@ -481,9 +515,11 @@ midi-generator source correct-channels --apply
 | ドラム候補CSVを保存 | `midi-generator catalog analyze-drums --csv data/reports/drum_candidates.csv` |
 | ドラムグルーヴ解析 | `midi-generator catalog analyze-grooves` |
 | ギターリフ解析 | `midi-generator catalog analyze-guitars` |
+| ギター参照更新のプレビュー | `midi-generator source reconcile-guitars --dry-run` |
+| 正式Backingの検索 | `midi-generator search --instrument guitar --guitar-role backing` |
 
 `analyze-drums`は候補判定であり、手動の楽器タグを自動付与しません。
-`source migrate`は素材を移動する管理用操作です。すでに楽器別に格納した通常運用では不要です。
+`source migrate`はギター以外の素材を移動する管理用操作です。ギターは手動配置後に`source reconcile-guitars`を使います。すでに楽器別に格納した通常運用では不要です。
 
 ## 14. エラーへの対処
 

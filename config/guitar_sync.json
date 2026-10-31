@@ -1,0 +1,28 @@
+{
+  "kick_notes": [
+    35,
+    36
+  ],
+  "snare_notes": [
+    38,
+    40
+  ],
+  "onset_tolerance_beats": 0.04,
+  "tail_tolerance_beats": 0.04,
+  "minimum_grid_alignment": 0.85,
+  "seed_score_window": 0.02,
+  "sync_weights": {
+    "kick_alignment": 0.5,
+    "grid_match": 0.12,
+    "syncopation_match": 0.12,
+    "rest_compatibility": 0.14,
+    "snare_accent_relation": 0.05,
+    "repetition_match": 0.07
+  },
+  "selection_weights": {
+    "rhythm_sync": 0.7,
+    "phrase_fit": 0.15,
+    "backing_suitability": 0.1,
+    "riff_support": 0.05
+  }
+}

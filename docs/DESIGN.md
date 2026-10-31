@@ -8,7 +8,7 @@ Build an independent, reusable MIDI generator callable through both CLI and Pyth
 - `modules/`: instrument-specific generators, added incrementally.
 - `reference_analysis/`: optional read-only audio loading, onset/tempo/rhythm/energy analysis, and independent JSON reporting.
 - `storage/`: MIDI source catalog, manual tag management, and pattern search/ranking.
-- `data/sources/<instrument>/<genre>/`: instrument-organized source assets; `unclassified/` holds unverified material. Directory-derived instrument data is kept distinct from manual tags.
+- `data/sources/`: guitar uses direct backing/lead roles; other instruments keep existing genre layouts; `unclassified/` holds unverified material. Directory-derived instrument data is kept distinct from manual tags.
 - CLI and Python API call the same core implementation.
 
 ## Initial implementation
@@ -50,7 +50,7 @@ evidence is reported instead of silently treated as a known match.
 
 ## Planned, not implemented
 - Pattern segmentation and MIDI transformation.
-- Guitar generation and advanced drum composition.
+- Lead guitar generation, active guitar rhythm editing, and advanced drum composition.
 - Reference-audio-driven pattern retrieval/generation (Phase 5.2), variable-tempo tracking, and downbeat/section interpretation.
 - Bass and synth generation.
 - Cross-instrument coordination.
@@ -86,6 +86,49 @@ articulation maps are never guessed or silently excluded.
 `storage/guitar_riffs.py` isolates batch errors and stores an independent,
 versioned, schema-defined report with source IDs and hashes. Minimal search
 dispatch routes guitar feature filters to this report; existing drum scoring and
-generation are unchanged. CLI/API call the same implementation. Guitar generation,
-tuning inference and automatic technique assignment are not implemented.
+generation are unchanged. CLI/API call the same implementation. Phase 6.2-A backing generation is separate from the read-only analyzer;
+lead generation, tuning inference and automatic technique assignment are not implemented.
 See `docs/GUITAR_RIFFS.md` for metric definitions and uncertainty.
+
+
+## Drum-synchronized backing guitar (Phase 6.2-A)
+
+`modules/guitar/sync.py` normalizes existing MIDI timelines to quarter beats and
+sixteenth cells, groups chord attacks, and computes configurable overlap, accent,
+rest and repetition scores. `backing.py` reuses catalog mandatory filters and
+Phase 6.1 reports, separates explicit roles from uncertain feature evidence,
+ranks candidates and performs a seeded choice within a configurable top band.
+Formal guitar source directories are now instrument/role only; genre remains a tag. The prototype
+heuristics are separate from formal role metadata.
+Filenames are not a generation rule. No inferred labels are written to manual tags.
+
+`render.py` retains source pitches, velocities, onset offsets, tracks and controls,
+with whole-phrase looping/cropping, boundary releases, fixed tempo/meter and guitar
+channel 1 by default. Export reserves new MIDI/JSON files exclusively. Core request
+fields are unchanged: two new JSON aliases normalize into existing `options`.
+The API dispatch and CLI flags share this one implementation. Drum generation,
+guitar analysis and reference-audio algorithms stay frozen.
+
+
+## Safe guitar source references (Phase 6.1.1)
+
+Only direct `guitar/backing/*.mid` and `guitar/lead/*.mid` placement establishes
+the formal role. Legacy guitar paths remain readable with null roles. Tags,
+filenames and musical features never establish this attribute. Existing guitar
+prototype algorithms remain unchanged in this source-management milestone.
+
+`storage/guitar_migration.py` builds a read-only one-to-one reconciliation plan
+from stable catalog IDs, current paths and saved MIDI hashes. Hash-duplicate
+identities require explicit mapping; registered records are never merged. Apply
+is all-or-nothing when identity problems exist, preserving tags, provenance,
+unknown user fields and cached feature values. Legacy genre and path history
+remain separate from current directory metadata.
+
+Both JSON before-images are verified and backed up before replacement. Staged,
+fsynced files, per-directory locks, a journal, optimistic hash checks and rollback
+provide recoverable updates, not a single multi-file filesystem transaction.
+Incomplete updates block normal catalog access until verified recovery. Recovery
+refuses changed metadata, tampered backups and live/conflicting locks. MIDI is
+never moved. Scans preserve stable IDs/history and refuse detectable unreconciled
+moves or ID collisions. Generic source migration no longer creates guitar genre
+folders or moves guitar-tagged flat assets. See `docs/GUITAR_SOURCE_MIGRATION.md`.

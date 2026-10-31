@@ -166,6 +166,8 @@ def organize_sources(
     config = load_instrument_config(_rooted(config_path, root))
     if instrument is not None and instrument not in INSTRUMENTS - {"other"}:
         raise ValueError(f"Unsupported source instrument: {instrument}")
+    if instrument == "guitar":
+        raise ValueError("Guitar placement is manual: use guitar/backing or guitar/lead, then source reconcile-guitars; source migrate does not move guitars")
     if genre is not None and genre not in GENRES:
         raise ValueError(f"Unsupported source genre: {genre}")
     if instrument in {"bass", "synth"} and genre == "hardcore":
@@ -207,6 +209,8 @@ def organize_sources(
             else instrument if is_unclassified and instrument
             else next((value for value in instruments if value in INSTRUMENTS - {"other"}), None)
         )
+        if target_instrument == "guitar":
+            continue
         if target_instrument:
             target_genre = series_genre or genre or next((value for value in styles if value in GENRES - {"other"}), "other")
             if target_instrument in {"bass", "synth"} and target_genre == "hardcore":
@@ -298,7 +302,7 @@ def organize_sources(
 
     # Ensure the requested taxonomy exists even if some branches are not yet populated.
     for relative in ("drums/metalcore", "drums/hardcore", "drums/other",
-                     "guitar/metalcore", "guitar/hardcore", "guitar/other",
+                     "guitar/backing", "guitar/lead",
                      "bass/metalcore", "bass/other", "synth/metalcore", "synth/other", "unclassified"):
         folder = source_root / relative
         folder.mkdir(parents=True, exist_ok=True)

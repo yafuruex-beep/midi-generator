@@ -1,7 +1,10 @@
 # Guitar riff analysis (Phase 6.1)
 
-This phase registers and analyzes guitar sources; guitar generation is not implemented.
-Instrument comes from the source directory, not channel or pitch. Sources currently
+Phase 6.1 registers and analyzes guitar sources. Backing generation is now provided
+separately by [Phase 6.2-A](GUITAR_BACKING.md); this analyzer remains read-only.
+Instrument comes from the source directory, not channel or pitch. Formal guitar
+roles now come only from direct `guitar/backing/` or `guitar/lead/` placement;
+legacy paths have a null role. See [safe reference updates](GUITAR_SOURCE_MIGRATION.md). Sources currently
 live directly in `data/sources/guitar/`; moving or renaming them is unnecessary.
 Metalcore style is a user-provided default, recorded as manual metadata, not an
 inference from filenames or MIDI. Unknown provenance/license details remain unknown.
@@ -119,3 +122,10 @@ All 324 source file paths and bytes were preserved. Registration added no sectio
 or performance annotations. Analysis never adds inferred labels to manual tags.
 Actual measurements/search examples and compatibility checks are recorded in
 `data/reports/phase61_verification_report.json`; tests generate their own MIDI fixtures.
+
+
+Phase 6.1.1 adds optional `guitar_role` source metadata to catalog batch reports
+and the existing JSON Schema without changing MIDI feature calculations.
+Relocation updates only paths/role/context after hash verification; source IDs,
+feature values, analysis timestamps and analysis version remain intact.
+Single-file feature analysis remains independent of formal catalog classification.

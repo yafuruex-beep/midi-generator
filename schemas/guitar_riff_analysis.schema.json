@@ -118,6 +118,7 @@
         "file_path": {
           "type": "string"
         },
+        "guitar_role": {"enum": ["backing", "lead", null]},
         "instrument": {
           "const": "guitar"
         },
@@ -970,6 +971,7 @@
         "file_path": {
           "type": "string"
         },
+        "guitar_role": {"enum": ["backing", "lead", null]},
         "instrument": {
           "const": "guitar"
         },

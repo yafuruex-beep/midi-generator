@@ -8,6 +8,7 @@ import re
 from typing import Any, Iterable, Mapping
 
 from midi_generator.storage.catalog import _load_catalog, _write_catalog
+from midi_generator.core.instruments import classify_source_path
 from midi_generator.modules.drums.groove import validate_groove_preferences
 from midi_generator.storage.drum_grooves import apply_groove_preferences, load_groove_index
 
@@ -260,8 +261,16 @@ class PatternSearchQuery:
     density: str | None = None
     tightness: float | None = None
     riff_characteristics: tuple[str, ...] = ()
+    guitar_role: str | None = None
 
     def __post_init__(self) -> None:
+        if self.guitar_role is not None:
+            if not isinstance(self.guitar_role, str) or self.guitar_role.lower() not in {"backing", "lead"}:
+                raise ValueError("guitar_role must be backing or lead")
+            if self.instrument is not None and self.instrument.lower() != "guitar":
+                raise ValueError("guitar_role filtering requires instrument='guitar'")
+            object.__setattr__(self, "guitar_role", self.guitar_role.lower())
+            object.__setattr__(self, "instrument", "guitar")
         validate_groove_preferences(self.groove_preferences())
         object.__setattr__(self, "riff_characteristics", tuple(_values(self.riff_characteristics)))
         if self.riff_characteristics:
@@ -328,8 +337,12 @@ def _search_record(
     if not record.get("present", True) or not isinstance(analysis, dict) or record.get("error"):
         return None
     tags = _tag_values(record)
+    classified_path = classify_source_path(record.get("path", ""))
+    formal_role = classified_path.get("guitar_role")
+    if query.guitar_role is not None and formal_role != query.guitar_role:
+        return None
     # Directory-derived instrument is the source-of-truth classification, not a manual tag.
-    directory_instrument = record.get("instrument")
+    directory_instrument = classified_path.get("instrument") if query.guitar_role is not None else record.get("instrument")
     if directory_instrument in INSTRUMENTS and directory_instrument not in tags["instrument"]:
         tags["instrument"].append(directory_instrument)
     flat_tags = {tag for values in tags.values() for tag in values}
@@ -423,6 +436,7 @@ def _search_record(
     preferred_meter = f"{signatures[0].get('numerator', 4)}/{signatures[0].get('denominator', 4)}"
     return {
         "file_id": record.get("file_id", record.get("path")),
+        **({"guitar_role": formal_role} if "guitar" in tags["instrument"] else {}),
         "file_path": record.get("path", analysis.get("path")),
         "instrument": tags["instrument"],
         "section": tags["section"],
@@ -471,6 +485,7 @@ def search_patterns(
     groove_analysis_path: str | Path | None = None,
     riff_characteristics: str | Iterable[str] | None = None,
     guitar_analysis_path: str | Path | None = None,
+    guitar_role: str | None = None,
 ) -> list[dict[str, Any]]:
     """Filter and rank catalog records. `tags` are OR preferences; `required_tags` are AND filters."""
     if query is None:
@@ -485,6 +500,7 @@ def search_patterns(
             subdivision=subdivision, timing_feel=timing_feel, syncopation=syncopation,
             backbeat=backbeat, double_kick=double_kick, density=density, tightness=tightness,
             riff_characteristics=tuple(_values(riff_characteristics)),
+            guitar_role=guitar_role,
         )
     weights = dict(DEFAULT_SCORE_WEIGHTS)
     if score_weights:

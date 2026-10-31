@@ -165,20 +165,21 @@ def test_organize_sources_backs_up_moves_preserves_stable_ids_tags_and_catalog(t
 
     result = organize_sources(project_root=root)
 
-    new_guitar = root / "data/sources/guitar/metalcore/lead.mid"
+    new_guitar = guitar
     new_unknown = root / "data/sources/unclassified/mystery.midi"
-    assert result["moved_count"] == 2
+    assert result["moved_count"] == 1
     assert new_guitar.read_bytes() == guitar_bytes
     assert new_unknown.read_bytes() == unknown_bytes
     assert (Path(result["backup_directory"]) / "data/sources/lead.mid").read_bytes() == guitar_bytes
     assert (Path(result["backup_directory"]) / "data/sources/mystery.midi").read_bytes() == unknown_bytes
     after = json.loads((root / "data/catalog/midi_catalog.json").read_text())
     moved = {item["path"]: item for item in after["files"]}
-    guitar_record = moved["data/sources/guitar/metalcore/lead.mid"]
+    guitar_record = moved["data/sources/lead.mid"]
     unknown_record = moved["data/sources/unclassified/mystery.midi"]
     assert guitar_record["file_id"] == "data/sources/lead.mid"
-    assert guitar_record["instrument"] == "guitar"
-    assert guitar_record["genre_directory"] == "metalcore"
+    assert guitar_record["instrument"] is None
+    assert guitar_record["genre_directory"] is None
+    assert not (root / "data/sources/guitar/metalcore").exists()
     assert guitar_record["tags"] == next(item["tags"] for item in before["files"] if item["path"].endswith("lead.mid"))
     assert "manual_keep" in get_tags("data/sources/lead.mid", catalog_path=root / "data/catalog/midi_catalog.json")["tags"]["custom"]
     assert unknown_record["instrument"] is None
