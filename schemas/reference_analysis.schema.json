@@ -1,0 +1,842 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:midi-generator:reference-analysis:1.0",
+  "title": "Reference Audio Analysis 1.0",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "absolute_path": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        },
+        "duration_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "sample_rate": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "channels": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "subtype": {
+          "type": "string"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "source_id": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "license": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "path",
+        "absolute_path",
+        "format",
+        "duration_seconds",
+        "sample_rate",
+        "channels",
+        "subtype",
+        "size_bytes",
+        "sha256",
+        "source_id",
+        "license"
+      ],
+      "additionalProperties": false
+    },
+    "analysis_range": {
+      "type": "object",
+      "properties": {
+        "start_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "end_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "duration_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "requested_start_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "requested_end_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "required": [
+        "start_seconds",
+        "end_seconds",
+        "duration_seconds",
+        "requested_start_seconds",
+        "requested_end_seconds"
+      ],
+      "additionalProperties": false
+    },
+    "tempo": {
+      "type": "object",
+      "properties": {
+        "estimated_bpm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/candidate"
+          }
+        },
+        "method": {
+          "const": "tempogram_and_onset_periodicity"
+        },
+        "status": {
+          "enum": [
+            "estimated",
+            "insufficient_evidence"
+          ]
+        },
+        "score_definition": {
+          "type": "string"
+        },
+        "selection_basis": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "estimated_bpm",
+        "confidence",
+        "candidates",
+        "method",
+        "status",
+        "score_definition",
+        "selection_basis"
+      ],
+      "additionalProperties": false
+    },
+    "onsets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/onset"
+      }
+    },
+    "rhythmic_activity": {
+      "type": "object",
+      "properties": {
+        "onsets_per_second": {
+          "type": "number",
+          "minimum": 0
+        },
+        "eighth_note_activity": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "sixteenth_note_activity": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "off_sixteenth_onset_ratio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "over_time": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/window"
+          }
+        },
+        "tempo_dependent": {
+          "const": true
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "activity_definition": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "onsets_per_second",
+        "eighth_note_activity",
+        "sixteenth_note_activity",
+        "off_sixteenth_onset_ratio",
+        "over_time",
+        "tempo_dependent",
+        "confidence",
+        "activity_definition"
+      ],
+      "additionalProperties": false
+    },
+    "accent_pattern": {
+      "type": "object",
+      "properties": {
+        "strong_onset_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "strength_threshold": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "offbeat_accent_ratio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "category_counts": {
+          "type": "object",
+          "properties": {
+            "on_beat": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "offbeat_eighth": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "offbeat_sixteenth": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unknown": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "on_beat",
+            "offbeat_eighth",
+            "offbeat_sixteenth",
+            "unknown"
+          ],
+          "additionalProperties": false
+        },
+        "strong_onsets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/strong_onset"
+          }
+        },
+        "interpretation": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "strong_onset_count",
+        "strength_threshold",
+        "offbeat_accent_ratio",
+        "category_counts",
+        "strong_onsets",
+        "interpretation"
+      ],
+      "additionalProperties": false
+    },
+    "energy": {
+      "type": "object",
+      "properties": {
+        "mean_rms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "segment_rms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "mean_square_energy": {
+          "type": "number",
+          "minimum": 0
+        },
+        "window_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "rms_over_time": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/rms_frame"
+          }
+        },
+        "units": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "mean_rms",
+        "segment_rms",
+        "mean_square_energy",
+        "window_seconds",
+        "rms_over_time",
+        "units"
+      ],
+      "additionalProperties": false
+    },
+    "grid_alignment": {
+      "type": "object",
+      "properties": {
+        "sixteenth_alignment_score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "eighth_alignment_score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "beat_alignment_score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "phase_seconds_within_beat": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "phase_time_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "phase_method": {
+          "type": "string"
+        },
+        "downbeat_known": {
+          "const": false
+        },
+        "onset_positions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/position"
+          }
+        },
+        "candidate_grids": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "bpm": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "sixteenth_alignment_score": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": [
+              "bpm",
+              "sixteenth_alignment_score"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "grid_metrics": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "beat": {
+                  "$ref": "#/$defs/grid_metric"
+                },
+                "eighth": {
+                  "$ref": "#/$defs/grid_metric"
+                },
+                "sixteenth": {
+                  "$ref": "#/$defs/grid_metric"
+                }
+              },
+              "required": [
+                "beat",
+                "eighth",
+                "sixteenth"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "interpretation": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sixteenth_alignment_score",
+        "eighth_alignment_score",
+        "beat_alignment_score",
+        "confidence",
+        "phase_seconds_within_beat",
+        "phase_time_seconds",
+        "phase_method",
+        "downbeat_known",
+        "onset_positions",
+        "candidate_grids",
+        "grid_metrics",
+        "interpretation"
+      ],
+      "additionalProperties": false
+    },
+    "analysis_metadata": {
+      "type": "object",
+      "properties": {
+        "algorithm_version": {
+          "const": "1.0"
+        },
+        "analyzed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "analysis_sample_rate": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "analysis_channels": {
+          "const": 1
+        },
+        "hop_length": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "n_fft": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "library_versions": {
+          "type": "object",
+          "properties": {
+            "numpy": {
+              "type": "string"
+            },
+            "librosa": {
+              "type": "string"
+            },
+            "soundfile": {
+              "type": "string"
+            },
+            "libsndfile": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "numpy",
+            "librosa",
+            "soundfile",
+            "libsndfile"
+          ],
+          "additionalProperties": false
+        },
+        "field_kinds": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string"
+            },
+            "energy": {
+              "type": "string"
+            },
+            "onsets": {
+              "type": "string"
+            },
+            "tempo": {
+              "type": "string"
+            },
+            "rhythmic_activity": {
+              "type": "string"
+            },
+            "accent_pattern": {
+              "type": "string"
+            },
+            "grid_alignment": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "source",
+            "energy",
+            "onsets",
+            "tempo",
+            "rhythmic_activity",
+            "accent_pattern",
+            "grid_alignment"
+          ],
+          "additionalProperties": false
+        },
+        "input_modified": {
+          "const": false
+        },
+        "midi_generated": {
+          "const": false
+        }
+      },
+      "required": [
+        "algorithm_version",
+        "analyzed_at",
+        "warnings",
+        "analysis_sample_rate",
+        "analysis_channels",
+        "hop_length",
+        "n_fft",
+        "library_versions",
+        "field_kinds",
+        "input_modified",
+        "midi_generated"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "source",
+    "analysis_range",
+    "tempo",
+    "onsets",
+    "rhythmic_activity",
+    "accent_pattern",
+    "energy",
+    "grid_alignment",
+    "analysis_metadata"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "onset": {
+      "type": "object",
+      "properties": {
+        "time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "relative_time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "strength": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "raw_strength": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "time_seconds",
+        "relative_time_seconds",
+        "strength",
+        "raw_strength"
+      ],
+      "additionalProperties": false
+    },
+    "candidate": {
+      "type": "object",
+      "properties": {
+        "bpm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "relative_score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "periodicity_score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "relationship": {
+          "enum": [
+            "primary_periodicity",
+            "half_tempo",
+            "double_tempo",
+            "alternative_periodicity"
+          ]
+        }
+      },
+      "required": [
+        "bpm",
+        "confidence",
+        "relative_score",
+        "periodicity_score",
+        "relationship"
+      ],
+      "additionalProperties": false
+    },
+    "window": {
+      "type": "object",
+      "properties": {
+        "time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "relative_time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "duration_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "onset_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "onsets_per_second": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "time_seconds",
+        "relative_time_seconds",
+        "duration_seconds",
+        "onset_count",
+        "onsets_per_second"
+      ],
+      "additionalProperties": false
+    },
+    "rms_frame": {
+      "type": "object",
+      "properties": {
+        "time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "relative_time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "duration_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "rms": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "time_seconds",
+        "relative_time_seconds",
+        "duration_seconds",
+        "rms"
+      ],
+      "additionalProperties": false
+    },
+    "strong_onset": {
+      "type": "object",
+      "properties": {
+        "onset_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "relative_time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "strength": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "grid_category": {
+          "enum": [
+            "on_beat",
+            "offbeat_eighth",
+            "offbeat_sixteenth",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "onset_index",
+        "time_seconds",
+        "relative_time_seconds",
+        "strength",
+        "grid_category"
+      ],
+      "additionalProperties": false
+    },
+    "position": {
+      "type": "object",
+      "properties": {
+        "onset_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "beat_position": {
+          "type": "number"
+        },
+        "category": {
+          "enum": [
+            "on_beat",
+            "offbeat_eighth",
+            "offbeat_sixteenth",
+            "unknown"
+          ]
+        },
+        "sixteenth_error_seconds": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "onset_index",
+        "beat_position",
+        "category",
+        "sixteenth_error_seconds"
+      ],
+      "additionalProperties": false
+    },
+    "grid_metric": {
+      "type": "object",
+      "properties": {
+        "alignment_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "aligned_onset_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "occupied_grid_ratio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "tolerance_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "alignment_score",
+        "aligned_onset_ratio",
+        "occupied_grid_ratio",
+        "tolerance_seconds"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

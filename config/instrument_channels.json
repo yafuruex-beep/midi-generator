@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "standard_channels": {
+    "drums": 10,
+    "guitar": 1,
+    "bass": 2,
+    "synth": 3
+  },
+  "correction": {
+    "in_place": true,
+    "backup_directory": "data/backups"
+  }
+}

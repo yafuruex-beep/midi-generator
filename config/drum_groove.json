@@ -1,0 +1,64 @@
+{
+  "drum_map": {
+    "kick": [
+      35,
+      36
+    ],
+    "snare": [
+      38,
+      40
+    ],
+    "hihat": [
+      42,
+      44,
+      46
+    ],
+    "cymbal": [
+      49,
+      51,
+      52,
+      53,
+      55,
+      57,
+      59
+    ],
+    "toms": [
+      41,
+      43,
+      45,
+      47,
+      48,
+      50
+    ]
+  },
+  "thresholds": {
+    "grid_tolerance_beats": 0.04,
+    "minimum_onsets": 8,
+    "straight_alignment": 0.85,
+    "sixteenth_min_count": 4,
+    "sixteenth_min_share": 0.2,
+    "eighth_max_share": 0.05,
+    "kick_sixteenth_min_share": 0.35,
+    "swing_min_pairs": 4,
+    "swing_min_share": 0.65,
+    "swing_min_cell_coverage": 0.5,
+    "swing_ratio_min": 0.58,
+    "swing_ratio_max": 0.75,
+    "swing_max_deviation": 0.04,
+    "syncopation_medium": 0.25,
+    "syncopation_high": 0.55,
+    "backbeat_min_snares": 4,
+    "backbeat_match_share": 0.7,
+    "snare_accent_velocity_share": 0.7,
+    "backbeat_bar_coverage": 0.4,
+    "double_kick_min_run": 3,
+    "double_kick_medium_share": 0.25,
+    "double_kick_heavy_share": 0.6,
+    "double_kick_heavy_notes_per_bar": 4,
+    "density_medium": 0.3,
+    "density_high": 0.7,
+    "density_kick_high_per_quarter": 2,
+    "density_snare_high_per_quarter": 1,
+    "density_cymbal_high_per_quarter": 3
+  }
+}

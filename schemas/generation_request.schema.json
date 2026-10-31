@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Generation Request",
+  "type": "object",
+  "required": [
+    "instrument",
+    "section",
+    "tempo",
+    "bars"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "instrument": {
+      "type": "string",
+      "minLength": 1
+    },
+    "section": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tempo": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "bars": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "time_signature": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "type": "integer",
+          "minimum": 1
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "key": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "chords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "style": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        {
+          "type": "object"
+        }
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "groove": {
+      "type": "object",
+      "properties": {
+        "subdivision": {"enum": ["eighth", "sixteenth", "mixed", "unknown"]},
+        "timing_feel": {"enum": ["straight", "swung", "unknown"]},
+        "syncopation": {"enum": ["low", "medium", "high", "unknown"]},
+        "backbeat": {"enum": ["standard", "half_time", "double_time", "other", "unknown"]},
+        "double_kick": {"enum": ["none", "light", "medium", "heavy", "unknown"]},
+        "density": {"enum": ["low", "medium", "high", "unknown"]},
+        "tightness": {"type": "number", "minimum": 0, "maximum": 1}
+      },
+      "additionalProperties": false
+    },
+    "options": {
+      "type": "object"
+    },
+    "generation_options": {
+      "type": "object"
+    },
+    "reference_audio": {},
+    "reference_artists": {},
+    "characteristics": {},
+    "seed": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

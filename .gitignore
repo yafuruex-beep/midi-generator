@@ -1,0 +1,35 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+dist/
+build/
+*.egg-info/
+.DS_Store
+
+# User assets and generated output
+data/sources/*
+!data/sources/.gitkeep
+data/cache/*
+!data/cache/.gitkeep
+output/*
+!output/.gitkeep
+
+# Additional environments and local-only project data
+.venv-*/
+data/references/*
+!data/references/.gitkeep
+data/catalog/*
+!data/catalog/.gitkeep
+data/reports/*
+!data/reports/.gitkeep
+data/archive/
+data/backups/
+
+# Local credentials
+.env
+.env.*
+*.pem
+*.key
+.ssh/

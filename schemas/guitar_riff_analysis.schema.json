@@ -1,0 +1,1015 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:midi-generator:guitar-riff-analysis:1.0",
+  "title": "Guitar Riff Analysis 1.0",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "analysis_version": {
+      "const": "1.0"
+    },
+    "analyzed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "project_root": {
+      "type": "string"
+    },
+    "catalog_file": {
+      "type": "string"
+    },
+    "analysis_config": {
+      "type": "object"
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "guitar_total",
+        "success_count",
+        "error_count",
+        "riff_characteristic_counts"
+      ]
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/success"
+          },
+          {
+            "$ref": "#/$defs/error"
+          }
+        ]
+      }
+    },
+    "policy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "analysis_version",
+    "analyzed_at",
+    "project_root",
+    "catalog_file",
+    "analysis_config",
+    "summary",
+    "sources",
+    "policy"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "statistics": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "minimum": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "maximum": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "mean": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "median": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "count",
+        "minimum",
+        "maximum",
+        "mean",
+        "median"
+      ],
+      "additionalProperties": false
+    },
+    "success": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "analysis_version": {
+          "const": "1.0"
+        },
+        "source_id": {
+          "type": "string"
+        },
+        "file_path": {
+          "type": "string"
+        },
+        "instrument": {
+          "const": "guitar"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "style": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "const": "ok"
+        },
+        "error": {
+          "type": "null"
+        },
+        "source_context": {
+          "type": "object",
+          "properties": {
+            "file_format": {
+              "enum": [
+                0,
+                1
+              ]
+            },
+            "ticks_per_beat": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "track_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "tracks": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "actual_midi_channels": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 16
+              }
+            },
+            "expected_midi_channel": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1,
+              "maximum": 16
+            },
+            "tempo_events": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "time_signature_events": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "duration_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "duration_quarter_beats": {
+              "type": "number",
+              "minimum": 0
+            },
+            "estimated_bars": {
+              "type": "number",
+              "minimum": 0
+            },
+            "tuning": {
+              "type": "null"
+            },
+            "note_policy": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "file_format",
+            "ticks_per_beat",
+            "track_count",
+            "tracks",
+            "actual_midi_channels",
+            "expected_midi_channel",
+            "tempo_events",
+            "time_signature_events",
+            "duration_seconds",
+            "duration_quarter_beats",
+            "estimated_bars",
+            "tuning",
+            "note_policy"
+          ],
+          "additionalProperties": false
+        },
+        "note_pairing": {
+          "type": "object",
+          "properties": {
+            "positive_note_ons": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "paired_note_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unmatched_note_offs": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "inferred_note_ends": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "excluded_note_counts": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "policy": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "positive_note_ons",
+            "paired_note_count",
+            "unmatched_note_offs",
+            "inferred_note_ends",
+            "excluded_note_counts",
+            "policy"
+          ],
+          "additionalProperties": false
+        },
+        "pitch": {
+          "type": "object",
+          "properties": {
+            "min_note": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 127
+            },
+            "max_note": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 127
+            },
+            "mean_note": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "median_note": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "used_note_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "note_on_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "note_counts": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "pitch_classes": {
+              "type": "object",
+              "properties": {
+                "C": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "C#": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "D": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "D#": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "E": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "F": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "F#": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "G": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "G#": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "A": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "A#": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "B": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "C",
+                "C#",
+                "D",
+                "D#",
+                "E",
+                "F",
+                "F#",
+                "G",
+                "G#",
+                "A",
+                "A#",
+                "B"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "min_note",
+            "max_note",
+            "mean_note",
+            "median_note",
+            "used_note_count",
+            "note_on_count",
+            "note_counts",
+            "pitch_classes"
+          ],
+          "additionalProperties": false
+        },
+        "polyphony": {
+          "type": "object",
+          "properties": {
+            "classification": {
+              "enum": [
+                "monophonic",
+                "mostly_monophonic",
+                "mixed",
+                "chord_based",
+                "unknown"
+              ]
+            },
+            "monophonic_ratio": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "two_note_ratio": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "three_plus_ratio": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "effective_ratios": {
+              "type": "object",
+              "properties": {
+                "monophonic_ratio": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "two_note_ratio": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "three_plus_ratio": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": [
+                "monophonic_ratio",
+                "two_note_ratio",
+                "three_plus_ratio"
+              ],
+              "additionalProperties": false
+            },
+            "max_simultaneous_notes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "mean_simultaneous_notes": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "mean_including_silence": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "sounding_beats": {
+              "type": "number",
+              "minimum": 0
+            },
+            "rest_ratio": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "supported_chord_time_ratio": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "ratio_basis": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "classification",
+            "monophonic_ratio",
+            "two_note_ratio",
+            "three_plus_ratio",
+            "effective_ratios",
+            "max_simultaneous_notes",
+            "mean_simultaneous_notes",
+            "mean_including_silence",
+            "sounding_beats",
+            "rest_ratio",
+            "supported_chord_time_ratio",
+            "ratio_basis"
+          ],
+          "additionalProperties": false
+        },
+        "rhythm": {
+          "type": "object",
+          "properties": {
+            "subdivision": {
+              "enum": [
+                "eighth",
+                "sixteenth",
+                "mixed",
+                "unknown"
+              ]
+            },
+            "syncopation": {
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "unknown"
+              ]
+            },
+            "density": {
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "unknown"
+              ]
+            },
+            "onset_group_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "notes_per_second": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "notes_per_quarter": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "notes_per_bar": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "onset_groups_per_quarter": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "per_bar": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "inter_onset_beats": {
+              "$ref": "#/$defs/statistics"
+            },
+            "sixteenth_alignment_share": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "sixteenth_off_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "sixteenth_off_share": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "tightness_score": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "syncopation_score": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "weak_accent_share": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "weak_after_rest_share": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "held_over_strong_beat_share": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "onset_positions_beats": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "gallop_pattern_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "gallop_pattern_share": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "required": [
+            "subdivision",
+            "syncopation",
+            "density",
+            "onset_group_count",
+            "notes_per_second",
+            "notes_per_quarter",
+            "notes_per_bar",
+            "onset_groups_per_quarter",
+            "per_bar",
+            "inter_onset_beats",
+            "sixteenth_alignment_share",
+            "sixteenth_off_count",
+            "sixteenth_off_share",
+            "tightness_score",
+            "syncopation_score",
+            "weak_accent_share",
+            "weak_after_rest_share",
+            "held_over_strong_beat_share",
+            "onset_positions_beats",
+            "gallop_pattern_count",
+            "gallop_pattern_share"
+          ],
+          "additionalProperties": false
+        },
+        "note_duration": {
+          "type": "object",
+          "properties": {
+            "beats": {
+              "$ref": "#/$defs/statistics"
+            },
+            "seconds": {
+              "$ref": "#/$defs/statistics"
+            },
+            "short_note_ratio": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "long_note_ratio": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "rests_beats": {
+              "$ref": "#/$defs/statistics"
+            },
+            "rests_seconds": {
+              "$ref": "#/$defs/statistics"
+            },
+            "rest_intervals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "start_beats": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "end_beats": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "duration_beats": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "duration_seconds": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "start_beats",
+                  "end_beats",
+                  "duration_beats",
+                  "duration_seconds"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "beats",
+            "seconds",
+            "short_note_ratio",
+            "long_note_ratio",
+            "rests_beats",
+            "rests_seconds",
+            "rest_intervals"
+          ],
+          "additionalProperties": false
+        },
+        "chords": {
+          "type": "object",
+          "properties": {
+            "classification": {
+              "enum": [
+                "power_chord",
+                "triad",
+                "extended_chord",
+                "other",
+                "unknown"
+              ]
+            },
+            "group_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "power_chord_ratio": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "triad_ratio": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "extended_chord_ratio": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "other_ratio": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "rejected_short_overlap_groups": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "structures": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "root_or_key_inferred": {
+              "const": false
+            }
+          },
+          "required": [
+            "classification",
+            "group_count",
+            "power_chord_ratio",
+            "triad_ratio",
+            "extended_chord_ratio",
+            "other_ratio",
+            "rejected_short_overlap_groups",
+            "structures",
+            "root_or_key_inferred"
+          ],
+          "additionalProperties": false
+        },
+        "repetition": {
+          "type": "object",
+          "required": [
+            "pitch_rhythm_period_bars",
+            "rhythm_period_bars",
+            "candidates",
+            "status"
+          ]
+        },
+        "riff_characteristics": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "chug",
+              "syncopated_riff",
+              "gallop",
+              "stop_and_go",
+              "power_chord_riff",
+              "single_note_riff",
+              "open_chord_riff",
+              "tremolo_like",
+              "mixed",
+              "unknown"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "riff_evidence": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "confidence": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 1
+              },
+              "metrics": {
+                "type": "object"
+              },
+              "interpretation": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "confidence",
+              "metrics",
+              "interpretation"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "possible_control_notes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "note": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 127
+              },
+              "event_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "higher_pitch_co_onset_share": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": [
+              "note",
+              "event_count",
+              "higher_pitch_co_onset_share"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "analysis_version",
+        "source_id",
+        "file_path",
+        "instrument",
+        "warnings",
+        "source_sha256",
+        "style",
+        "status",
+        "error",
+        "source_context",
+        "note_pairing",
+        "pitch",
+        "polyphony",
+        "rhythm",
+        "note_duration",
+        "chords",
+        "repetition",
+        "riff_characteristics",
+        "riff_evidence",
+        "possible_control_notes"
+      ],
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "analysis_version": {
+          "const": "1.0"
+        },
+        "source_id": {
+          "type": "string"
+        },
+        "file_path": {
+          "type": "string"
+        },
+        "instrument": {
+          "const": "guitar"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "const": "error"
+        },
+        "error": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "message"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "analysis_version",
+        "source_id",
+        "file_path",
+        "instrument",
+        "warnings",
+        "status",
+        "error"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

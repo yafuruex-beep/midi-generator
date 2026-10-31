@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "instrument": "drums",
+  "section": "breakdown",
+  "tempo": 105,
+  "time_signature": [
+    4,
+    4
+  ],
+  "bars": 4,
+  "style": {
+    "genre": [
+      "metalcore",
+      "hardcore"
+    ],
+    "rhythmic_density": "high",
+    "syncopation": "high"
+  },
+  "tags": [
+    "half_time",
+    "double_kick"
+  ],
+  "options": {},
+  "seed": 12345
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Pattern Metadata",
+  "type": "object",
+  "required": [
+    "pattern_id",
+    "source_id",
+    "instrument"
+  ],
+  "properties": {
+    "pattern_id": {
+      "type": "string"
+    },
+    "source_id": {
+      "type": "string"
+    },
+    "instrument": {
+      "type": "string"
+    },
+    "section_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tempo_bpm": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "time_signature": {
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "license_notes": {
+      "type": "string"
+    },
+    "features": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true
+}
