@@ -26,7 +26,7 @@ BPMはギター素材と異なっていて構いませんが、参照ドラム�
 ## CLI
 
 ```bash
-midi-generator generate --instrument guitar --guitar-role backing --section intro --tempo 160 --bars 8 --time-signature 4/4 --style metalcore --sync-to-drums output/drums_intro_160bpm_8bars.mid --seed 42 --output output/guitar_backing_intro.mid
+midi-generator generate --instrument guitar --guitar-role backing --section intro --tempo 160 --bars 8 --time-signature 4/4 --style metalcore --sync-to-drums output/archive/early_validation/drums_intro_160bpm_8bars.mid --seed 42 --output output/archive/early_validation/guitar_backing_intro.mid
 ```
 
 主な指定：
@@ -63,7 +63,7 @@ result = generate({
     "bars": 8,
     "time_signature": [4, 4],
     "style": ["metalcore"],
-    "sync_to_drums": "output/drums_intro_160bpm_8bars.mid",
+    "sync_to_drums": "output/archive/early_validation/drums_intro_160bpm_8bars.mid",
     "seed": 42,
 }, output_path="output/my_backing.mid")
 print(result.output_files)
@@ -167,7 +167,7 @@ MIDIの隣に`.mid.json`を保存します。
 ロールは未確認として扱い、生成時の警告を残しています。
 
 ```bash
-midi-generator generate --config examples/requests/guitar_backing_intro.json --catalog data/cache/phase62_guitar_validation_catalog.json --guitar-analysis data/catalog/guitar_riff_analysis.json --output output/guitar_backing_intro.mid
+midi-generator generate --config examples/requests/guitar_backing_intro.json --catalog data/cache/phase62_guitar_validation_catalog.json --guitar-analysis data/catalog/guitar_riff_analysis.json --output output/archive/early_validation/guitar_backing_intro.mid
 ```
 
 この検証用カタログ・素材・ドラムは再配布ZIPに含まれません。

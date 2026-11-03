@@ -36,7 +36,8 @@
 | WAV・MP3・FLACの参考音源解析 | audio追加依存関係の導入で対応 |
 | 参考音源を渡すだけで、その音源に合わせたMIDIを自動生成 | 未対応。解析結果を見て、人が生成条件を決める |
 | ギターバッキングのMIDI生成 | 生成済みドラムに同期する既存リフの選択方式に対応 |
-| リードギター・ベース・シンセのMIDI生成 | 未対応 |
+| ギター追従の単音ベース生成 | 対応（[設定・制約](BASS_FOLLOW.md)） |
+| リードギター・シンセのMIDI生成 | 未対応 |
 | AIによる自動作曲・自動採譜 | 未対応 |
 
 生成には利用者自身のMIDI素材が必要です。配布ZIPにはサンプルパックや参考音源を含めていません。
@@ -418,7 +419,7 @@ Phase 6.2-Aではバッキング生成に対応しています。リードは未
 プロトタイプ内部の推定・タグヒントは正式なカタログ分類とは別です。
 
 ```bash
-midi-generator generate --instrument guitar --guitar-role backing --section intro --tempo 160 --bars 8 --time-signature 4/4 --style metalcore --sync-to-drums output/drums_intro_160bpm_8bars.mid --seed 42 --output output/guitar_backing_intro.mid
+midi-generator generate --instrument guitar --guitar-role backing --section intro --tempo 160 --bars 8 --time-signature 4/4 --style metalcore --sync-to-drums output/archive/early_validation/drums_intro_160bpm_8bars.mid --seed 42 --output output/archive/early_validation/guitar_backing_intro.mid
 ```
 
 参照ドラムのBPM・拍子は生成指定と一致が必要です。
@@ -622,3 +623,41 @@ python scripts/package_release.py --output dist/midi-generator-with-cli-referenc
 配布物に素材・音源・個人カタログ・仮想環境は入りません。
 利用条件と配布範囲は[再配布ガイド](DISTRIBUTION.md)、
 全体の配置は[フォルダ構成ガイド](PROJECT_LAYOUT.md)で確認できます。
+
+### Reference Pattern Map（Phase 7.1 Step 3）
+
+指定区間の小節候補・活動量・反復・休止候補を独立JSONへ保存します。
+
+```bash
+.venv/bin/midi-generator reference pattern-map "data/references/The Queendom.wav" \
+  --start 0 --end 90 --time-signature 4/4 --bar-start 0 \
+  --section-name intro
+```
+
+保存先は既定で `data/cache/reference_patterns/<内容ハッシュ>.json`。
+`--output` で別のJSONパスを指定できます。同じ内容は再利用し、異なる既存ファイルは上書きしません。
+BPM・拍子・小節起点は解析上の仮説です。未指定の拍子は暫定4/4で、確定判定ではありません。
+従来の `reference analyze` とそのキャッシュは変更しません。
+詳しくは [Reference Pattern Map](REFERENCE_PATTERN_MAP.md) を参照してください。
+
+Referenceの実テンポを確認して手動指定する場合だけ、解析コマンドへ
+`--reference-tempo 120` を追加してください。省略時は音源から自動推定し、
+推定不能なら不明のまま保持します。希望するMIDI出力BPMは渡しません。
+旧 `reference pattern-map --tempo 120` は警告付きの互換指定です。
+新旧の同時指定はエラーです。生成用の `generate --tempo 105` は従来どおりです。
+
+### Reference生成計画（Phase 7.2 Step 2・MIDIは生成しない）
+
+```bash
+.venv/bin/midi-generator reference plan \
+  --config output/reference_plans/not_my_time_chorus.input.json \
+  --output output/reference_plans/not_my_time_chorus.json
+```
+
+設定JSONには `pattern_map_path`、`export_bpm`、`bar_range`、`section`、
+`time_signature`、`repeat_blocks`、`reference_bpm_confirmed`、`bar_start_confirmed`
+を指定します。小節範囲は両端を含み、中間小節も対象です。
+`repeat_blocks` は `[{"source": [16, 17], "reuse": [36, 37]}]` の形式です。
+小節起点などが未確認なら実行条件未充足として保存します。
+条件が揃っても実行機能はまだありません。既存ファイルは上書きしません。
+[仕様・Python API例](REFERENCE_GENERATION_PLAN.md)を参照してください。

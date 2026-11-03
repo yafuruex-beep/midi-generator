@@ -401,3 +401,198 @@ references, and verify style/section tags. Formal generation integration should
 then restrict retrieval to verified backing-folder records and be auditioned;
 the existing prototype's warned role heuristics are not the formal source label.
 Historical generation sidecars and temporary validation catalogs are not rewritten.
+
+## Phase 7.0 Step 2 — Reference section analysis
+
+Added `analyze_reference_section()` to the public Python API. Reuses optional
+reference DSP for bounded range analysis and adds provisional regular beat/bar
+hypotheses, per-bar activity changes, full-mix quiet candidates and deterministic
+bar-shape repetition IDs. Meter/downbeat ambiguity is explicit; no automatic
+instrument-specific rest claim is made. Existing reference reports and MIDI
+engines remain unchanged. No new dependencies.
+
+Step 3 versioned persistence/schema/CLI and Step 5 Python 3.11 source-ZIP environment
+reconstruction have not been implemented or verified in this step. Resource
+preflight caps section duration at 120 seconds and raw decoded input at 128 MiB;
+streaming decode is not implemented. See `docs/REFERENCE_SECTION.md`.
+
+Verification: **225 passed in 5.44s** (208 existing + 17 new cases), including
+existing MIDI generation and source-ZIP layout tests. Python 3.13.6 arm64.
+
+## Phase 7.1 Step 3 — Reference Pattern Map persistence
+
+Added a separate version-1.0 JSON adapter over Step 2, atomic exclusive saving,
+content-addressed default paths under `data/cache/reference_patterns/`, validated
+readback and `reference pattern-map`. Integer-equivalent CLI/API inputs normalize
+to the same identity. Different existing files and the legacy cache destination
+are never overwritten. No new dependencies or DSP/generation changes.
+
+Schema: `schemas/reference_pattern_map.schema.json`.
+Guide/API examples: `docs/REFERENCE_PATTERN_MAP.md`.
+
+Step-3-only verification: **7 passed in 2.15s**, using generated WAVs. Tested
+schema validity, Step 2 adaptation, readback, stable repeated inputs, cache reuse,
+no overwrite, silent/short/invalid audio and old-cache protection. The earlier
+integer-versus-float cache-key mismatch was corrected and the tests rerun.
+
+Read-only actual-reference check: The Queendom 0–90 seconds, 105 BPM / 4/4
+hypothesis / origin 0 produced 40 bar intervals (including the final partial bar)
+and 3 full-mix quiet candidates. The saved map validates and reuses without a
+write. Original audio and legacy reference-cache hashes matched. These results
+are acoustic hypotheses, not instrument transcription or validated song sections.
+
+The MIDI generators, sync modules, existing reference analyzer, dependency list
+and release script were not changed in Step 3. Full regression/resource testing
+(Step 4), source-ZIP reconstruction (Step 5), and calibrated/variable-tempo or
+meter/downbeat inference remain pending. No full-suite or release test was run
+for this step, as requested.
+
+## Phase 7.1 Step 4B-0 — Reference versus Export BPM
+
+Implemented `reference_tempo_bpm` / `reference pattern-map --reference-tempo`.
+Legacy `tempo_bpm` / `--tempo` retain their analysis-override meaning and emit
+warnings; simultaneous new/old overrides are errors. Generation request tempo,
+`generate --tempo`, generators and synchronization modules are unchanged. No
+Export BPM is accepted by Pattern Map analysis. Failed estimation stays unknown.
+
+New maps use schema **1.1**, analyzer **7.1-bpm.1**, and record
+`reference_tempo.{bpm,source,confidence}` with estimated/manual origin. The old
+`effective_tempo` remains a compatibility alias; original automatic candidates
+remain separate. Half/double ambiguity and the distinction between BPM support
+and downbeat support are warned about. Feature vectors and repetition thresholds
+are unchanged.
+
+Schema 1.0 is preserved at `schemas/reference_pattern_map_v1.schema.json`.
+Old maps load unchanged with a warning; their analysis overrides are not confirmed
+Reference tempos. There is no automatic rewrite, relabeling, or cache migration.
+Versioned content identity prevents old/new key collisions. Existing save guards
+prevent replacement of old caches. No dependencies added.
+
+Verification: **240 passed, 10 expected legacy-argument FutureWarnings in 6.15s**.
+This includes 8 added BPM responsibility/compatibility cases, existing Reference
+regressions, and existing MIDI generation/synchronization tests. The focused
+Reference run passed 32 tests in 3.73s.
+
+The Queendom 0–90 seconds was analyzed with automatic Reference tempo and manual
+4/4 / bar-origin-0 hypotheses: estimated BPM 117.34894413336433 (confidence null),
+45 bar intervals. This is not confirmed original meter/tempo. New map:
+`data/cache/reference_patterns/67152a4d07753ae0cfec69772d14f376d650532c064121b91de7aa101cc6e03e.json`.
+Schema validation and readback passed. The old 105-BPM map remains unchanged and
+loads with the legacy warning. All 498 pre-existing files under source/reference/
+catalog/cache data roots retained their hashes during this check.
+
+Remaining: verify Reference pulse/downbeat by listening/annotations, assess
+half/double candidates and repetition accuracy under the correct grid, resource
+and Python 3.11 distribution checks. Phase 7.2 was not started.
+
+## Phase 7.2 Step 2 — Generation plan JSON only
+
+Added an independent `planning` package with create/validate/save/load APIs and
+`reference plan --config ... --output ...`. Plans record Reference Map identity,
+Reference BPM provenance, distinct Export BPM, selected complete bars, explicit
+repetition blocks, quarter-note export positions, informational Reference features,
+reuse keys and execution prerequisites. They do not call any generator.
+
+Explicit reuse requires an earlier, nonoverlapping original block with the same
+length, meter, generation conditions and known Pattern ID sequence. Repeated IDs
+alone never group blocks. Partial bars are excluded; out-of-range references,
+overlaps, duplicate reuse destinations, chains and meter conversion are rejected.
+Unknown/unconfirmed BPM or origin prevents eligibility. Legacy maps require
+reanalysis. Null confidence never supplies confirmation. Eligibility means plan
+prerequisites only; execution is unimplemented for every plan.
+
+Guide: `docs/REFERENCE_GENERATION_PLAN.md`.
+Schema: `schemas/reference_generation_plan.schema.json`.
+
+Local example: `output/reference_plans/not_my_time_chorus.input.json` and
+`output/reference_plans/not_my_time_chorus.json`. Selection 16–37 includes the
+intervening bars; section `chorus` is an illustrative generation condition for
+that whole range, not inferred real-song section annotation. The plan contains
+20 blocks / 22 bars / 88 beats. Bars 16–17 are a new planned pair at beat 0; bars
+36–37 reuse it at beat 80; both are 8 beats and P005→P013. Export BPM is 105;
+Reference BPM remains estimated 106.00556691091187. User-observed approximate
+106 BPM following is acknowledged, but origin 0 is not confirmed: eligibility is
+false with `bar_start_unconfirmed`. No MIDI was created by planning or example
+execution. API/CLI results match and validate against the schema.
+
+Final verification: **262 passed, 10 expected legacy-argument warnings in 5.92s**,
+including 22 new plan cases and the existing generation/synchronization regressions
+on temporary test fixtures. All 500 original source/reference/catalog/cache files
+and 17 existing output MIDI retained their hashes in the example check. AST
+comparison confirms `api.generate()` is unchanged. Instrument modules, sync,
+Reference classifier/features/0.92 threshold and dependencies are unchanged.
+
+Next step requires a reviewed generation plan, confirmed Reference bar origin,
+source-library/section/phrase-fit validation and a separately authorized executor.
+No generator connection, assembly, automatic fill/rest/dynamics or later Phase 7.2
+step was implemented here.
+
+
+## Phase 7.3 Step 1 — Rhythm Blueprint and rule backing (B)
+
+Added an independent one-bar, 4/4, sixteenth-grid pipeline: drum MIDI to
+immutable RhythmBlueprint, deterministic single-pitch BackingStep sequence, then
+MIDI rendering with separate Export BPM. No guitar sources or catalogs are used.
+Existing generation, material selection, sync scores and Reference analysis are
+unchanged. See `docs/RULE_BACKING.md` for API, rules and rejection policies.
+
+Next C: probabilistic/weighted step selection from the same Blueprint, reusing
+the renderer; seeds, multiple candidates and bass are not implemented here.
+Long-term D: investigate learned drum/guitar/bass correspondence and AI inference;
+no training, inference implementation or dependencies are added in this step.
+Only B one-bar generation is implemented; multi-bar/swing, key/chord/tuning
+inference and instrument-specific keyswitches remain unsupported.
+
+
+## Phase 7.3 Step 2 — read-only selection of one drum bar
+
+`extract_rhythm_blueprint(..., bar_index=1)` selects the second complete 4/4
+bar from a longer MIDI using half-open absolute-tick bounds and local-zero
+normalization. Omitted/None bar_index retains Step 1 strict input length behavior.
+Negative/non-integer/absent/partial bars reject. Full-source constant tempo/meter
+and Note On/Off pairing are validated; crossing releases remain untouched.
+The existing mapping, 0.04-beat onset tolerance, rule generator and renderer are
+preserved. Blueprint provenance adds source bar index and tick bounds.
+See `docs/RULE_BACKING.md` and `tests/test_rule_backing_bars.py`.
+
+Output remains one local guitar bar. Multi-bar placement/assembly, cross-clip
+continuity, phrase planning and C probabilistic generation remain future work.
+No source editing, guitar material selection, AI, bass or dependencies added.
+
+Step 2 verification: **325 passed** (300 existing + 25 new), with 10 expected
+legacy-argument warnings. Existing data/output files: 1,487 hash matches; no
+changes. Existing unrelated src/tests/config files are hash-identical; AST checks
+confirm the step generator and MIDI renderer are unchanged.
+
+Real source: `data/sources/drums/hardcore/RoseNuMetal-S01-G01.mid`, 4/4, constant
+200 BPM, 16 bars, tpb=480. Selected second bar has kick cells [2,10,12], snare
+cells [0,6,8,14]. Seven selected drum onsets map within the unchanged 0.04-beat
+tolerance, with a warning. New local one-bar E3/GM program 31/Export BPM 105 output:
+`output/phase73_step2/guitar_bar2_105bpm_E3.mid`, with same-name JSON report
+containing source/output hashes, Blueprint, steps, timing errors and checks.
+All three kick cells are covered; raw kick timing errors are within tolerance.
+Original source and prior outputs remain untouched. Audio listening validation
+and multi-bar placement/continuity are not claimed. Step 2 stops here.
+
+
+## Phase 7.4 Step 3 — selectable guitar note duration
+
+Expanded existing `BackingRules.duration_steps` from maximum 1 to 2 sixteenth
+steps, enabling .125/.25/.5-quarter-beat gates through the existing optional
+`generate_backing_steps(..., rules=...)` API. Default .5 step (.125 beats) is
+unchanged. Next-attack/bar-end capping and renderer are retained. No onset,
+supplement/rest, pitch, velocity, drum, material selection or Reference rule
+changes. Added duration/regression tests; see `docs/RULE_BACKING.md`.
+
+Step 3 verification: **345 passed** (325 existing + 20 added), 10 expected
+legacy-argument warnings. Pre-change default-output golden hash and previous
+accepted sample MIDI both match byte-for-byte. A/B/C have identical eight
+attacks/pitches/velocities/counts; actual gates .125/.25/.5 quarter beats.
+No shortening in the sample; retrigger/final-sixteenth tests shorten .5 to .25
+beats and verify Note Off precedes Note On at shared ticks. Extractor, step
+generator and renderer executable bodies are AST-identical (docstring excluded);
+only BackingRules gate validation maximum changed. Existing data/output files
+(1507) retained all hashes. New sample directory:
+`output/phase74_step3_duration_105bpm` (three guitars, three drum/guitar pairs, shared
+drum, verification JSON and guide). No audio-listening validation claimed.
+Step 3 stops here.

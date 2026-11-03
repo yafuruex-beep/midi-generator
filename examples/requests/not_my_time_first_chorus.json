@@ -1,0 +1,26 @@
+{
+  "reference_audio": "data/references/01 Not My Time.mp3",
+  "reference_sha256": "b4d555484b50a711ee1c343937931b85c4378fdfa6fd3a0abb74500b042f8a8c",
+  "reference_map": "data/cache/reference_patterns/aa13fa132720d000b94c892f6b697d9348dbe1c8a37aa6cb0e630942ecb3efff.json",
+  "reference_bpm": 106.00556691091187,
+  "reference_origin_seconds": 0.45,
+  "export_bpm": 105,
+  "leading_silence_seconds": 0.45,
+  "end_beat": 106,
+  "chorus_user_annotation": {
+    "start": "15.3", "end": "27.3", "notation": "one-based bar.beat in 4/4; end is the boundary at beat 3",
+    "start_beat": 58, "end_beat": 106,
+    "source": "current user messages", "confidence": null
+  },
+  "guitar": {"root": 52, "program": 31, "voicing": "mixed", "power_chord_ratio": 0.75, "duration_steps": 1, "rhythm_mode": "phrase4", "duration_mode": "contrast"},
+  "bass": {"transpose_semitones": -24, "program": 34, "midi_channel": 2},
+  "master_catalog": "data/catalog/midi_catalog.json",
+  "sections": [
+    {"id": "intro", "label": "Intro候補", "start_beat": 0, "end_beat": 8, "status": "estimated_acoustic_region", "evidence": "Low RMS before the strongest existing spectral/RMS transition near 4.978s; semantic label unconfirmed", "drum_sources": ["data/sources/drums/metalcore/RoseNuMetal-S10-G07.mid"], "velocities": {"base_velocity": 58, "kick_velocity": 86, "strong_velocity": 78, "accent_velocity": 82}},
+    {"id": "verse", "label": "Verse候補", "start_beat": 8, "end_beat": 24, "status": "estimated_acoustic_region", "evidence": "Contains the previously reported first-verse excerpt; ends at density/spectral change near 14.034s; exact boundaries unconfirmed", "drum_sources": ["data/sources/drums/metalcore/RoseNuMetal-S03-G07.mid"]},
+    {"id": "development", "label": "Verse展開候補", "start_beat": 24, "end_beat": 40, "status": "estimated_acoustic_region", "evidence": "Existing map shows increased onset density and RMS around 14.034–23.090s; semantic role unconfirmed", "drum_sources": ["data/sources/drums/metalcore/RoseNuMetal-S07-G10.mid"]},
+    {"id": "transition", "label": "サビ前展開部（Pre-Chorus候補）", "start_beat": 40, "end_beat": 58, "status": "estimated_acoustic_region", "evidence": "Acoustic change near 23.090s followed by user-specified chorus entry; a distinct pre-chorus is not verified", "drum_sources": ["data/sources/drums/metalcore/RoseNuMetal-S09-G05.mid", "data/sources/drums/metalcore/RoseNuMetal-S05-G02.mid"]},
+    {"id": "chorus", "label": "Chorus", "start_beat": 58, "end_beat": 106, "status": "user_supplied_boundary", "evidence": "Current user: first chorus starts 15.3 and ends 27.3", "drum_sources": ["data/sources/drums/metalcore/RoseNuMetal-S10-G09.mid", "data/sources/drums/metalcore/RoseNuMetal-S03-G07.mid", "data/sources/drums/metalcore/RoseNuMetal-S10-G09.mid"]}
+  ],
+  "arrangement_policy": "Drum choices, local section velocities, and 4-bar motif reuse are original arrangement choices informed by coarse full-mix density/energy; no reference notes/melody/drum transcription is copied. Temporary catalog tags are task assignments, never user-verified source annotations."
+}

@@ -3,6 +3,8 @@ from pathlib import Path
 from typing import Any, Mapping
 from midi_generator.core.midi_io import copy_midi, convert_midi_channel, inspect_midi, load_midi, save_midi
 from midi_generator.core.models import GenerationRequest, GenerationResult
+from midi_generator.planning import (create_reference_generation_plan, validate_reference_generation_plan,
+                                     save_reference_generation_plan, load_reference_generation_plan)
 from midi_generator.storage.catalog import analyze_midi, scan_midi_catalog
 from midi_generator.storage.drum_analysis import (
     analyze_catalog_drums,
@@ -27,8 +29,16 @@ from midi_generator.storage.sources import (
 from midi_generator.modules.drums.generator import generate_drums
 from midi_generator.modules.drums.groove import analyze_drum_groove
 from midi_generator.storage.drum_grooves import analyze_catalog_grooves, get_drum_groove_analysis
-from midi_generator.reference_analysis import analyze_reference_audio, save_reference_analysis
+from midi_generator.reference_analysis import (
+    analyze_reference_audio, save_reference_analysis, analyze_reference_section,
+    analyze_reference_pattern_map, build_reference_pattern_map,
+    save_reference_pattern_map, load_reference_pattern_map, validate_reference_pattern_map,
+)
 from midi_generator.modules.guitar import analyze_guitar_midi
+from midi_generator.modules.guitar.rule_backing import (
+    RhythmBlueprint, BackingRules, BackingStep,
+    extract_rhythm_blueprint, generate_backing_steps, generate_backing_phrase, render_backing_midi,
+)
 from midi_generator.storage.guitar_riffs import analyze_catalog_guitars, get_guitar_riff_analysis, search_guitar_riffs
 from midi_generator.storage.guitar_migration import reconcile_guitar_sources, recover_guitar_references
 
@@ -53,8 +63,11 @@ def generate(
     guitar_analysis_path: str | Path | None = None,
     guitar_sync_config_path: str | Path | None = None,
 ) -> GenerationResult:
-    """Generate a MIDI asset through the shared template-based instrument engine."""
+    """Generate a MIDI asset through the shared instrument implementations."""
     validated = request if isinstance(request, GenerationRequest) else GenerationRequest.from_dict(request)
+    if validated.instrument.lower() == "bass":
+        from midi_generator.modules.bass import generate_follow_bass
+        return generate_follow_bass(validated, output_path=output_path, project_root=project_root)
     if validated.instrument.lower() == "guitar":
         from midi_generator.modules.guitar.backing import generate_backing_guitar
         return generate_backing_guitar(validated, output_path=output_path, catalog_path=catalog_path,
@@ -69,7 +82,13 @@ def generate(
 
 
 __all__ = [
+    "RhythmBlueprint", "BackingRules", "BackingStep",
+    "extract_rhythm_blueprint", "generate_backing_steps", "generate_backing_phrase", "render_backing_midi",
     "GenerationRequest",
+    "create_reference_generation_plan",
+    "validate_reference_generation_plan",
+    "save_reference_generation_plan",
+    "load_reference_generation_plan",
     "GenerationResult",
     "reconcile_guitar_sources",
     "recover_guitar_references",
@@ -78,6 +97,12 @@ __all__ = [
     "get_guitar_riff_analysis",
     "search_guitar_riffs",
     "analyze_reference_audio",
+    "analyze_reference_section",
+    "analyze_reference_pattern_map",
+    "build_reference_pattern_map",
+    "save_reference_pattern_map",
+    "load_reference_pattern_map",
+    "validate_reference_pattern_map",
     "save_reference_analysis",
     "analyze_drum_groove",
     "analyze_catalog_grooves",

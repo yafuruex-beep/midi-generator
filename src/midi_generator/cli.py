@@ -60,6 +60,20 @@ def build_parser() -> argparse.ArgumentParser:
     reference_analyze.add_argument("--output", required=True, help="UTF-8 JSON output path")
     reference_analyze.add_argument("--overwrite", action="store_true", help="Explicitly replace an existing JSON report")
     reference_analyze.add_argument("--verbose", action="store_true", help="Print the complete analysis instead of a summary")
+    pattern_parser = reference_subparsers.add_parser("pattern-map", help="Save a versioned full-mix section Pattern Map")
+    pattern_parser.add_argument("audio_path")
+    pattern_parser.add_argument("--start", type=float, default=0.0)
+    pattern_parser.add_argument("--end", type=float)
+    reference_tempo_group = pattern_parser.add_mutually_exclusive_group()
+    reference_tempo_group.add_argument("--reference-tempo", type=float, help="Manual Reference audio BPM override; never Export BPM")
+    reference_tempo_group.add_argument("--tempo", type=float, help="Deprecated alias for --reference-tempo, not Export BPM")
+    pattern_parser.add_argument("--time-signature", help="Optional meter hypothesis, e.g. 4/4")
+    pattern_parser.add_argument("--bar-start", type=float, help="Absolute source time of an assumed bar origin")
+    pattern_parser.add_argument("--section-name")
+    pattern_parser.add_argument("--output", help="JSON destination; default content-addressed data/cache/reference_patterns/")
+    plan_parser = reference_subparsers.add_parser("plan", help="Create a generation plan JSON only; never generate MIDI")
+    plan_parser.add_argument("--config", required=True, help="Plan input JSON; paths relative to current directory")
+    plan_parser.add_argument("--output", required=True, help="New plan JSON destination")
     inspect_parser = subparsers.add_parser("inspect", help="Inspect a MIDI file")
     inspect_parser.add_argument("midi_file")
 
@@ -181,7 +195,7 @@ def build_parser() -> argparse.ArgumentParser:
     search_parser.add_argument("--pitch-max", type=int, help="Maximum overlapping MIDI note number")
     search_parser.add_argument("--catalog", default="data/catalog/midi_catalog.json")
 
-    generate_parser = subparsers.add_parser("generate", help="Generate an instrument MIDI from a catalog pattern")
+    generate_parser = subparsers.add_parser("generate", help="Generate instrument MIDI from a catalog pattern or guitar-follow request")
     generate_parser.add_argument("--config", help="JSON generation request file")
     generate_parser.add_argument("--instrument")
     generate_parser.add_argument("--section")
@@ -195,7 +209,7 @@ def build_parser() -> argparse.ArgumentParser:
     generate_parser.add_argument("--sync-to-drums", help="Existing drum MIDI used as a guitar rhythm reference")
     generate_parser.add_argument("--guitar-analysis", help="Independent Phase 6.1 guitar analysis JSON")
     generate_parser.add_argument("--guitar-sync-config", help="Guitar synchronization weights/settings JSON")
-    generate_parser.add_argument("--midi-channel", type=int, help="One-based MIDI channel; drums default 10, guitar backing default 1")
+    generate_parser.add_argument("--midi-channel", type=int, help="One-based MIDI channel; drums default 10, guitar backing default 1, bass follow fixed 2")
     generate_parser.add_argument("--output", help="Output MIDI path; defaults to a descriptive path in output/")
     generate_parser.add_argument("--catalog", default="data/catalog/midi_catalog.json")
     generate_parser.add_argument("--project-root", default=".")
@@ -210,7 +224,39 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     args = build_parser().parse_args()
     try:
-        if args.command == "reference":
+        if args.command == "reference" and args.reference_command == "plan":
+            from midi_generator.planning import create_reference_generation_plan, save_reference_generation_plan
+            with Path(args.config).open(encoding="utf-8") as stream:
+                request = json.load(stream)
+            if not isinstance(request, dict):
+                raise ValueError("Plan config must be a JSON object")
+            try:
+                result = create_reference_generation_plan(**request)
+            except TypeError as error:
+                raise ValueError(f"Invalid plan config: {error}") from error
+            saved = save_reference_generation_plan(result, args.output)
+            print(json.dumps({"output_file": str(saved), "plan_id": result["plan_id"],
+                              "execution": result["execution"], "blocks": len(result["blocks"])},
+                             ensure_ascii=False, indent=2, allow_nan=False))
+        elif args.command == "reference" and args.reference_command == "pattern-map":
+            from midi_generator.reference_analysis import analyze_reference_pattern_map, save_reference_pattern_map
+            meter = None
+            if args.time_signature is not None:
+                meter = [int(value) for value in args.time_signature.split("/")]
+            tempo_options = {"reference_tempo_bpm": args.reference_tempo}
+            if args.tempo is not None:
+                print("Warning: --tempo is deprecated; use --reference-tempo for Reference audio BPM, not Export BPM", file=sys.stderr)
+                tempo_options = {"reference_tempo_bpm": args.tempo}
+            result = analyze_reference_pattern_map(
+                args.audio_path, start_seconds=args.start, end_seconds=args.end,
+                **tempo_options, time_signature=meter, bar_start_seconds=args.bar_start,
+                section_name=args.section_name,
+            )
+            saved = save_reference_pattern_map(result, args.output)
+            print(json.dumps({"output_file": str(saved), "map_id": result["map_id"],
+                              "bar_count": len(result["bars"]), "pattern_sequence": result["pattern_sequence"],
+                              "warnings": result["warnings"]}, ensure_ascii=False, indent=2, allow_nan=False))
+        elif args.command == "reference":
             from midi_generator.reference_analysis import analyze_reference_audio, save_reference_analysis
             if Path(args.output).exists() and not args.overwrite:
                 raise FileExistsError(f"Reference report already exists: {args.output}; use --overwrite to replace it")

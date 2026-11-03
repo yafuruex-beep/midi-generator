@@ -1,0 +1,1009 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://midi-generator.local/schemas/reference_pattern_map.schema.json",
+  "title": "Reference Pattern Map 1.1",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.1"
+    },
+    "map_id": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "reference_id": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "source_audio_path": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "absolute_path": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        },
+        "duration_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "sample_rate": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "channels": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "subtype": {
+          "type": "string"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "source_id": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "license": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "path",
+        "absolute_path",
+        "format",
+        "duration_seconds",
+        "sample_rate",
+        "channels",
+        "subtype",
+        "size_bytes",
+        "sha256",
+        "source_id",
+        "license"
+      ],
+      "additionalProperties": false
+    },
+    "section_name": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "start_time": {
+      "type": "number",
+      "minimum": 0
+    },
+    "end_time": {
+      "type": "number",
+      "minimum": 0
+    },
+    "analysis_range": {
+      "type": "object",
+      "properties": {
+        "start_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "end_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "duration_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "requested_start_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "requested_end_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "required": [
+        "start_seconds",
+        "end_seconds",
+        "duration_seconds",
+        "requested_start_seconds",
+        "requested_end_seconds"
+      ],
+      "additionalProperties": false
+    },
+    "estimated_tempo": {
+      "type": "object",
+      "properties": {
+        "estimated_bpm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/candidate"
+          }
+        },
+        "method": {
+          "const": "tempogram_and_onset_periodicity"
+        },
+        "status": {
+          "enum": [
+            "estimated",
+            "insufficient_evidence"
+          ]
+        },
+        "score_definition": {
+          "type": "string"
+        },
+        "selection_basis": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "estimated_bpm",
+        "confidence",
+        "candidates",
+        "method",
+        "status",
+        "score_definition",
+        "selection_basis"
+      ],
+      "additionalProperties": false
+    },
+    "effective_tempo": {
+      "type": "object",
+      "properties": {
+        "bpm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "source": {
+          "enum": [
+            "user",
+            "estimated"
+          ]
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "bpm",
+        "source",
+        "confidence"
+      ],
+      "additionalProperties": false
+    },
+    "time_signature": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 32
+            },
+            {
+              "enum": [
+                1,
+                2,
+                4,
+                8,
+                16,
+                32
+              ]
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "source": {
+          "enum": [
+            "user",
+            "provisional_assumption"
+          ]
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "value",
+        "source",
+        "confidence"
+      ],
+      "additionalProperties": false
+    },
+    "bar_grid": {
+      "type": "object",
+      "properties": {
+        "origin_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "source": {
+          "enum": [
+            "user",
+            "estimated_pulse_assumed_downbeat"
+          ]
+        },
+        "downbeat_verified": {
+          "const": false
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "origin_seconds",
+        "source",
+        "downbeat_verified",
+        "confidence"
+      ],
+      "additionalProperties": false
+    },
+    "beat_positions": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "bars": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/bar"
+      }
+    },
+    "pattern_sequence": {
+      "type": "array",
+      "items": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "pattern": "^P[0-9]{3,}$"
+      }
+    },
+    "activity": {
+      "type": "object",
+      "properties": {
+        "mean_rms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "segment_rms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "mean_square_energy": {
+          "type": "number",
+          "minimum": 0
+        },
+        "window_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "rms_over_time": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/rms_frame"
+          }
+        },
+        "units": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "mean_rms",
+        "segment_rms",
+        "mean_square_energy",
+        "window_seconds",
+        "rms_over_time",
+        "units"
+      ],
+      "additionalProperties": false
+    },
+    "onset_density": {
+      "type": "object",
+      "properties": {
+        "onsets_per_second": {
+          "type": "number",
+          "minimum": 0
+        },
+        "eighth_note_activity": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "sixteenth_note_activity": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "off_sixteenth_onset_ratio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "over_time": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/window"
+          }
+        },
+        "tempo_dependent": {
+          "const": true
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "activity_definition": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "onsets_per_second",
+        "eighth_note_activity",
+        "sixteenth_note_activity",
+        "off_sixteenth_onset_ratio",
+        "over_time",
+        "tempo_dependent",
+        "confidence",
+        "activity_definition"
+      ],
+      "additionalProperties": false
+    },
+    "silence_candidates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/pause"
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "properties": {
+        "tempo": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "meter": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "bar_grid": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "tempo",
+        "meter",
+        "bar_grid"
+      ],
+      "additionalProperties": false
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "analysis_parameters": {
+      "type": "object",
+      "properties": {
+        "sample_rate": {
+          "type": "number",
+          "minimum": 0
+        },
+        "hop_length": {
+          "type": "number",
+          "minimum": 0
+        },
+        "n_fft": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pause_window_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pause_min_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pause_relative_threshold": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pause_absolute_floor": {
+          "type": "number",
+          "minimum": 0
+        },
+        "effective_pause_threshold": {
+          "type": "number",
+          "minimum": 0
+        },
+        "repetition_cosine_threshold": {
+          "type": "number",
+          "minimum": 0
+        },
+        "repetition_bins": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "decoded_input_budget_mib": {
+          "type": "number",
+          "minimum": 0
+        },
+        "activity_score_definition": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sample_rate",
+        "hop_length",
+        "n_fft",
+        "pause_window_seconds",
+        "pause_min_seconds",
+        "pause_relative_threshold",
+        "pause_absolute_floor",
+        "effective_pause_threshold",
+        "repetition_cosine_threshold",
+        "repetition_bins",
+        "max_seconds",
+        "decoded_input_budget_mib",
+        "activity_score_definition"
+      ],
+      "additionalProperties": false
+    },
+    "analyzer_version": {
+      "const": "7.1-bpm.1"
+    },
+    "section_analyzer_version": {
+      "enum": [
+        "7.0-step2.1",
+        "7.1-bpm.1"
+      ]
+    },
+    "library_versions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "required": [
+        "numpy",
+        "librosa",
+        "soundfile"
+      ]
+    },
+    "interpretation": {
+      "type": "string"
+    },
+    "reference_tempo": {
+      "type": "object",
+      "properties": {
+        "bpm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "source": {
+          "enum": [
+            "estimated",
+            "manual"
+          ]
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "bpm",
+        "source",
+        "confidence"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "map_id",
+    "reference_id",
+    "source_audio_path",
+    "source",
+    "section_name",
+    "start_time",
+    "end_time",
+    "analysis_range",
+    "estimated_tempo",
+    "effective_tempo",
+    "time_signature",
+    "bar_grid",
+    "beat_positions",
+    "bars",
+    "pattern_sequence",
+    "activity",
+    "onset_density",
+    "silence_candidates",
+    "confidence",
+    "warnings",
+    "analysis_parameters",
+    "analyzer_version",
+    "section_analyzer_version",
+    "library_versions",
+    "interpretation",
+    "reference_tempo"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "onset": {
+      "type": "object",
+      "properties": {
+        "time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "relative_time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "strength": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "raw_strength": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "time_seconds",
+        "relative_time_seconds",
+        "strength",
+        "raw_strength"
+      ],
+      "additionalProperties": false
+    },
+    "candidate": {
+      "type": "object",
+      "properties": {
+        "bpm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "relative_score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "periodicity_score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "relationship": {
+          "enum": [
+            "primary_periodicity",
+            "half_tempo",
+            "double_tempo",
+            "alternative_periodicity"
+          ]
+        }
+      },
+      "required": [
+        "bpm",
+        "confidence",
+        "relative_score",
+        "periodicity_score",
+        "relationship"
+      ],
+      "additionalProperties": false
+    },
+    "window": {
+      "type": "object",
+      "properties": {
+        "time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "relative_time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "duration_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "onset_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "onsets_per_second": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "time_seconds",
+        "relative_time_seconds",
+        "duration_seconds",
+        "onset_count",
+        "onsets_per_second"
+      ],
+      "additionalProperties": false
+    },
+    "rms_frame": {
+      "type": "object",
+      "properties": {
+        "time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "relative_time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "duration_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "rms": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "time_seconds",
+        "relative_time_seconds",
+        "duration_seconds",
+        "rms"
+      ],
+      "additionalProperties": false
+    },
+    "strong_onset": {
+      "type": "object",
+      "properties": {
+        "onset_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "relative_time_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "strength": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "grid_category": {
+          "enum": [
+            "on_beat",
+            "offbeat_eighth",
+            "offbeat_sixteenth",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "onset_index",
+        "time_seconds",
+        "relative_time_seconds",
+        "strength",
+        "grid_category"
+      ],
+      "additionalProperties": false
+    },
+    "position": {
+      "type": "object",
+      "properties": {
+        "onset_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "beat_position": {
+          "type": "number"
+        },
+        "category": {
+          "enum": [
+            "on_beat",
+            "offbeat_eighth",
+            "offbeat_sixteenth",
+            "unknown"
+          ]
+        },
+        "sixteenth_error_seconds": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "onset_index",
+        "beat_position",
+        "category",
+        "sixteenth_error_seconds"
+      ],
+      "additionalProperties": false
+    },
+    "grid_metric": {
+      "type": "object",
+      "properties": {
+        "alignment_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "aligned_onset_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "occupied_grid_ratio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "tolerance_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "alignment_score",
+        "aligned_onset_ratio",
+        "occupied_grid_ratio",
+        "tolerance_seconds"
+      ],
+      "additionalProperties": false
+    },
+    "pause": {
+      "type": "object",
+      "properties": {
+        "start_time": {
+          "type": "number",
+          "minimum": 0
+        },
+        "end_time": {
+          "type": "number",
+          "minimum": 0
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "confidence_kind": {
+          "const": "heuristic_quietness_not_probability"
+        }
+      },
+      "required": [
+        "start_time",
+        "end_time",
+        "confidence",
+        "confidence_kind"
+      ],
+      "additionalProperties": false
+    },
+    "bar": {
+      "type": "object",
+      "properties": {
+        "bar_index": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "start_time": {
+          "type": "number",
+          "minimum": 0
+        },
+        "end_time": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pattern_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^P[0-9]{3,}$"
+        },
+        "partial": {
+          "type": "boolean"
+        },
+        "activity_score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "rms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "onset_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "onset_density": {
+          "type": "number",
+          "minimum": 0
+        },
+        "silence_candidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pause"
+          }
+        },
+        "confidence": {
+          "type": "object",
+          "properties": {
+            "bar_grid": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "repetition": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "required": [
+            "bar_grid",
+            "repetition"
+          ],
+          "additionalProperties": false
+        },
+        "density_change": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "rms_change": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "bar_index",
+        "start_time",
+        "end_time",
+        "pattern_id",
+        "partial",
+        "activity_score",
+        "rms",
+        "onset_count",
+        "onset_density",
+        "silence_candidates",
+        "confidence",
+        "density_change",
+        "rms_change"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

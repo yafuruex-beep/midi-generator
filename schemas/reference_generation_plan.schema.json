@@ -1,0 +1,393 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "planner_version": {
+      "const": "7.2-plan.1"
+    },
+    "plan_id": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "reference_map": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "map_id": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "schema_version": {
+          "enum": [
+            "1.0",
+            "1.1"
+          ]
+        },
+        "reference_id": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "map_id",
+        "schema_version",
+        "reference_id"
+      ],
+      "additionalProperties": false
+    },
+    "reference_tempo": {
+      "type": "object",
+      "properties": {
+        "bpm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "source": {
+          "enum": [
+            "manual",
+            "estimated",
+            "legacy_unverified"
+          ]
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "bpm",
+        "source",
+        "confidence"
+      ],
+      "additionalProperties": false
+    },
+    "bar_grid": {
+      "type": "object"
+    },
+    "export_bpm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "time_signature": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "type": "integer",
+          "minimum": 1
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "section": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requested_bar_range": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "included_reference_bars": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "excluded_partial_bars": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "explicit_repeat_blocks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "reuse": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "minItems": 2,
+            "maxItems": 2
+          }
+        },
+        "required": [
+          "source",
+          "reuse"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "confirmations": {
+      "type": "object",
+      "properties": {
+        "reference_bpm": {
+          "type": "boolean"
+        },
+        "bar_start": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "reference_bpm",
+        "bar_start"
+      ],
+      "additionalProperties": false
+    },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "block_id": {
+            "type": "string"
+          },
+          "reference_bars": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "reference_time_range": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": 0
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "export_start_beat": {
+            "type": "number",
+            "minimum": 0
+          },
+          "export_length_beats": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "pattern_sequence": {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "generation_conditions": {
+            "type": "object",
+            "properties": {
+              "section": {
+                "type": "string",
+                "minLength": 1
+              },
+              "export_bpm": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "time_signature": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                ],
+                "minItems": 2,
+                "maxItems": 2
+              }
+            },
+            "required": [
+              "section",
+              "export_bpm",
+              "time_signature"
+            ],
+            "additionalProperties": false
+          },
+          "action": {
+            "enum": [
+              "generate_pair",
+              "reuse_pair"
+            ]
+          },
+          "reuse_from": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reuse_key": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          },
+          "reference_features": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "bar_index": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "activity_score": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "onset_density": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "confidence": {
+                  "type": "object"
+                },
+                "silence_candidates": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              },
+              "required": [
+                "bar_index",
+                "activity_score",
+                "onset_density",
+                "confidence",
+                "silence_candidates"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "block_id",
+          "reference_bars",
+          "reference_time_range",
+          "export_start_beat",
+          "export_length_beats",
+          "pattern_sequence",
+          "generation_conditions",
+          "action",
+          "reuse_from",
+          "reuse_key",
+          "reference_features",
+          "warnings"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "total_export_beats": {
+      "type": "number",
+      "minimum": 0
+    },
+    "reference_warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "execution": {
+      "type": "object",
+      "properties": {
+        "eligible": {
+          "type": "boolean"
+        },
+        "implemented": {
+          "const": false
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "eligible",
+        "implemented",
+        "blockers"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "planner_version",
+    "plan_id",
+    "reference_map",
+    "reference_tempo",
+    "bar_grid",
+    "export_bpm",
+    "time_signature",
+    "section",
+    "requested_bar_range",
+    "included_reference_bars",
+    "excluded_partial_bars",
+    "explicit_repeat_blocks",
+    "confirmations",
+    "blocks",
+    "total_export_beats",
+    "reference_warnings",
+    "warnings",
+    "execution"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://midi-generator.local/schemas/reference_generation_plan.schema.json",
+  "title": "Reference generation plan 1.0 (no executor)"
+}

@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "instrument": "bass",
+  "section": "validation",
+  "tempo": 105,
+  "bars": 8,
+  "time_signature": [4, 4],
+  "options": {
+    "guitar_midi": "output/phase74_step7_groove_105bpm_8bars/guitar_B_contrast_105bpm_8bars.mid",
+    "transpose_semitones": -12,
+    "program": 34,
+    "midi_channel": 2
+  }
+}

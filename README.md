@@ -267,7 +267,7 @@ result = generate({
 print(result.output_files)
 ```
 
-`GenerationRequest` is the shared generation input model. Pattern segmentation, advanced drum composition, lead/bass/synth generation, and reference-driven MIDI generation remain planned.
+`GenerationRequest` is the shared generation input model. Guitar-follow monophonic bass generation is available through the shared API/CLI; see [BASS_FOLLOW.md](docs/BASS_FOLLOW.md). Pattern segmentation, advanced drum composition, lead/synth generation, and reference-driven MIDI generation remain planned.
 
 ## Reference audio analysis (Phase 5.1)
 

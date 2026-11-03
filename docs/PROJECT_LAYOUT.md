@@ -18,7 +18,7 @@ midi-generator/
 │   └── requests/             汎用生成リクエスト例
 ├── schemas/                  JSON Schema
 ├── tests/                    外部素材不要の自動テスト
-├── scripts/                  再配布ZIPの作成
+├── scripts/                  再配布ZIP・試聴生成・統合検証
 ├── docs/                     設計・開発状況・各機能ガイド
 ├── data/                     ローカルの入力・管理データ
 │   ├── sources/              MIDI素材（ギターはbacking/lead、他は既存構造）
@@ -28,7 +28,8 @@ midi-generator/
 │   ├── reports/              検証結果と過去の実行記録
 │   ├── archive/              現行処理で使わない過去データ
 │   └── backups/              復元用バックアップ
-├── output/                   生成MIDI・生成条件・出典のサイドカー
+├── output/                   採用結果・最新生成物（README.mdから参照）
+│   └── archive/              旧比較・初期検証・生成中間物
 └── dist/                     素材を含まない再配布ZIP（作成後）
 ```
 
@@ -77,3 +78,24 @@ MIDI素材、生成MIDI、現行カタログの配置・内容、カタログID�
 旧ジャンル階層や直下の素材は互換用に残し、正式ロールは未分類です。
 以前のgenre/role階層の推奨はこのルールで置き換えます。
 現在の99件は動かしていません。[参照更新の手順](GUITAR_SOURCE_MIGRATION.md)を参照してください。
+
+
+## Phase 9完了後の整理
+
+採用済みStep 7-B、ベースA2、Phase 9統合MIDIは従来のディレクトリを維持。
+旧Phase 7.3〜7.4 Step 6比較は `output/archive/phase7/`、古い単発検証は
+`output/archive/early_validation/` にまとめた。`output/queendom_105_fsharp/` と
+`output/reference_plans/` は別の成果物・参照データとして維持している。
+
+Phase 9の `generation_work/` と初期保留レポートは
+`output/archive/working/phase9_not_my_time_first_chorus/` に分離。
+最終MIDI、最終構成表・検証結果は `output/phase9_not_my_time_first_chorus/` に残す。
+
+移動対応表は `output/archive/path_redirects.json`。
+実際の移動ファイル一覧・SHA-256・更新前メタデータは、対応表からリンクする
+`data/backups/directory-cleanup-*/` に保存している。過去の実行ログやマニフェスト内の
+パスは実行時の証跡として残し、この対応表で読み替える。
+
+自動生成のPython/pytestキャッシュも削除せず `data/archive/runtime_cache/` へ退避。
+実行により再生成される場合がある。`.venv/`、元MIDI・参考音源・現行カタログ・
+既存バックアップ、ギターの正式ロールディレクトリは移動していない。
