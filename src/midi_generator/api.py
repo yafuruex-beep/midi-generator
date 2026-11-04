@@ -39,6 +39,7 @@ from midi_generator.modules.guitar.rule_backing import (
     RhythmBlueprint, BackingRules, BackingStep,
     extract_rhythm_blueprint, generate_backing_steps, generate_backing_phrase, render_backing_midi,
 )
+from midi_generator.modules.guitar.motif_variations import develop_backing_motif
 from midi_generator.storage.guitar_riffs import analyze_catalog_guitars, get_guitar_riff_analysis, search_guitar_riffs
 from midi_generator.storage.guitar_migration import reconcile_guitar_sources, recover_guitar_references
 
@@ -65,6 +66,8 @@ def generate(
 ) -> GenerationResult:
     """Generate a MIDI asset through the shared instrument implementations."""
     validated = request if isinstance(request, GenerationRequest) else GenerationRequest.from_dict(request)
+    if "riff_style" in validated.options and validated.instrument.lower() != "guitar":
+        raise ValueError("riff_style is supported only for instrument='guitar'")
     if validated.instrument.lower() == "bass":
         from midi_generator.modules.bass import generate_follow_bass
         return generate_follow_bass(validated, output_path=output_path, project_root=project_root)
@@ -82,7 +85,7 @@ def generate(
 
 
 __all__ = [
-    "RhythmBlueprint", "BackingRules", "BackingStep",
+    "RhythmBlueprint", "BackingRules", "BackingStep", "develop_backing_motif",
     "extract_rhythm_blueprint", "generate_backing_steps", "generate_backing_phrase", "render_backing_midi",
     "GenerationRequest",
     "create_reference_generation_plan",

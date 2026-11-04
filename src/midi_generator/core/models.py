@@ -76,7 +76,7 @@ class GenerationRequest:
         accepted = {
             "version", "instrument", "section", "tempo", "bars", "time_signature", "key", "chords",
             "style", "tags", "options", "generation_options", "reference_audio", "reference_artists",
-            "characteristics", "seed", "groove", "guitar_role", "sync_to_drums",
+            "characteristics", "seed", "groove", "guitar_role", "sync_to_drums", "riff_style",
         }
         unknown = sorted(set(data) - accepted)
         if unknown:
@@ -86,7 +86,7 @@ class GenerationRequest:
         if not isinstance(options, Mapping) or not isinstance(generation_options, Mapping):
             raise ValueError("options and generation_options must be JSON objects")
         merged_options = {**options, **generation_options}
-        for name in ("reference_audio", "reference_artists", "characteristics", "guitar_role", "sync_to_drums"):
+        for name in ("reference_audio", "reference_artists", "characteristics", "guitar_role", "sync_to_drums", "riff_style"):
             if name in data:
                 merged_options[name] = data[name]
         styles = data.get("style", {})

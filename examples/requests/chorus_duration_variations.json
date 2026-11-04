@@ -1,0 +1,33 @@
+{
+  "sources": {
+    "guitar": {
+      "path": "output/phase9_step8_chord_voicing/guitar_C_balanced.mid",
+      "sha256": "9866460e99bedf3c67d97bf0eef6d20994ccfbd2445009c8fee7c3272d1e962d"
+    },
+    "bass": {
+      "path": "output/phase9_step8_chord_voicing/bass_C_balanced.mid",
+      "sha256": "2c2b24cf5094ef1fe2ce17e33743e6adbb9c7fc6e57fb9bc1e9f951f688651d6"
+    },
+    "band": {
+      "path": "output/phase9_step8_chord_voicing/chorus_C_balanced.mid",
+      "sha256": "af2f4e3fca9bbe0ccf68968fad587974375b205b8b88b0133a2f1cf41f136f34"
+    },
+    "drums": {
+      "path": "output/phase9_step8_chord_voicing/drums_shared.mid",
+      "sha256": "5e1e1ec371970c7199ee90ba4495b88c6b96155f4b4d71dc1f2dabdf13f04c38"
+    }
+  },
+  "export_bpm": 105,
+  "baseline_short_beats": 0.25,
+  "short_beats": 0.125,
+  "long_beats": 0.5,
+  "weak_velocity_below": 96,
+  "contrast_step": 8,
+  "contrast_min_velocity": 100,
+  "design_basis": [
+    "Measured baseline gate groups: .25x56, .5x4. IOI .5x52, .75x3, .25x2, 1.25x2.",
+    "B halves only existing weak .25-beat gates; strong .25-beat gates and the existing four .5-beat gates remain.",
+    "C keeps the B short base and extends the existing step8/velocity100 accent in each bar to the measured .5-beat long value when the IOI permits.",
+    "No extrapolated articulation keys; only Note Off timing changes. Bass events are frozen, not regenerated to new guitar gates."
+  ]
+}

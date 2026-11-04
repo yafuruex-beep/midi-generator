@@ -1,0 +1,11 @@
+{
+  "source_chorus_midi": "output/phase9_step2_groove_consistency/after_chorus_8bars.mid",
+  "source_sha256": "dcf48b59f0f74f5634a3a1f456c7242f4cc141237898ea9ea5e7038da783fc48",
+  "motif_request": "examples/requests/not_my_time_groove_consistency.json",
+  "section_id": "chorus",
+  "candidates": {
+    "A": "current",
+    "B": "repetition",
+    "C": "call_response"
+  }
+}

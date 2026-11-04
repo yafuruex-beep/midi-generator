@@ -9,6 +9,7 @@ import re
 from midi_generator.core.models import GenerationResult
 from midi_generator.modules.guitar.analysis import ANALYSIS_VERSION
 from midi_generator.modules.guitar.timeline import read_timeline
+from midi_generator.modules.guitar.riff_styles import RIFF_STYLES, render_riff_style
 from midi_generator.modules.guitar.render import phrase_fit, render_backing, source_length_bars
 from midi_generator.modules.guitar.sync import (
     ALGORITHM_VERSION, analyze_drum_sync, attack_pattern, constant_context,
@@ -86,7 +87,11 @@ def generate_backing_guitar(request, *, output_path=None, catalog_path="data/cat
                             project_root=".", guitar_analysis_path=None, sync_config_path=None):
     if request.instrument.lower() != "guitar":
         raise ValueError("Backing guitar generation requires instrument='guitar'")
-    role = request.options.get("guitar_role")
+    styled = "riff_style" in request.options
+    riff_style = request.options.get("riff_style")
+    if styled and riff_style not in RIFF_STYLES:
+        raise ValueError(f"Invalid riff_style {riff_style!r}; choose from {', '.join(RIFF_STYLES)}")
+    role = request.options.get("guitar_role", "backing" if styled else None)
     if role is None:
         raise ValueError("Without an explicit guitar_role, generation supports drums only; specify guitar_role='backing' and sync_to_drums")
     if role != "backing":
@@ -94,7 +99,12 @@ def generate_backing_guitar(request, *, output_path=None, catalog_path="data/cat
     drum_path = request.options.get("sync_to_drums")
     if not isinstance(drum_path, str) or not drum_path.strip():
         raise ValueError("Backing guitar requires sync_to_drums pointing to an existing drum MIDI")
-    if request.key is not None or request.chords:
+    if styled:
+        if request.time_signature != (4, 4):
+            raise ValueError("riff_style currently supports 4/4 only")
+        if request.key not in (None, "E minor") or request.chords:
+            raise ValueError("riff_style currently supports E minor only; omit chords")
+    elif request.key is not None or request.chords:
         raise ValueError("Guitar transpose/key/chord adaptation is not implemented; omit key and chords")
     channel = request.options.get("midi_channel", 1)
     if type(channel) is not int or not 1 <= channel <= 16:
@@ -111,6 +121,24 @@ def generate_backing_guitar(request, *, output_path=None, catalog_path="data/cat
         raise ValueError(f"Guitar sync config not found: {config_file}")
     drum = analyze_drum_sync(drum_file, tempo=request.tempo, bars=request.bars,
                              time_signature=request.time_signature, config=config)
+    if styled:
+        generated = render_riff_style(riff_style, tempo=request.tempo, bars=request.bars,
+                                      channel=channel, seed=request.seed, drum=drum)
+        desired = (_rooted(output_path, root) if output_path else
+                   root / "output" / f"guitar_{riff_style}_{request.tempo:g}bpm_{request.bars}bars.mid")
+        if desired.suffix.lower() not in {".mid", ".midi"}:
+            desired = desired.with_suffix(".mid")
+        metadata = {
+            "instrument": "guitar", "guitar_role": "backing", "riff_style": riff_style,
+            "algorithm_version": "riff_styles_v1", "key": "E minor",
+            "section": request.section, "tempo": request.tempo, "bars": request.bars,
+            "time_signature": list(request.time_signature), "midi_channel": channel,
+            "seed": 0 if request.seed is None else request.seed,
+            "drum_reference": {"path": str(drum_file), "sha256": drum_hash, "analysis": drum},
+            "effective_config": config, "warnings": drum["warnings"],
+        }
+        path = _save_output(generated, metadata, desired)
+        return GenerationResult(output_files=[path], warnings=drum["warnings"], metadata=metadata)
     catalog = _load_catalog(catalog_file)
     styles = request.style
     if isinstance(styles, dict):

@@ -206,6 +206,7 @@ def build_parser() -> argparse.ArgumentParser:
     generate_parser.add_argument("--tags", help="Comma-separated required pattern tags")
     generate_parser.add_argument("--seed", type=int)
     generate_parser.add_argument("--guitar-role", help="Guitar role: backing supported; lead is not implemented")
+    generate_parser.add_argument("--riff-style", help="Opt-in generated backing riff style")
     generate_parser.add_argument("--sync-to-drums", help="Existing drum MIDI used as a guitar rhythm reference")
     generate_parser.add_argument("--guitar-analysis", help="Independent Phase 6.1 guitar analysis JSON")
     generate_parser.add_argument("--guitar-sync-config", help="Guitar synchronization weights/settings JSON")
@@ -400,7 +401,7 @@ def main() -> None:
                     raise ValueError("Generation config must contain a JSON object")
             else:
                 request_data = {}
-            for name in ("instrument", "section", "tempo", "bars", "seed", "guitar_role", "sync_to_drums"):
+            for name in ("instrument", "section", "tempo", "bars", "seed", "guitar_role", "sync_to_drums", "riff_style"):
                 value = getattr(args, name)
                 if value is not None:
                     request_data[name] = value

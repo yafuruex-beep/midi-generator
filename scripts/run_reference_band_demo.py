@@ -13,7 +13,7 @@ from pathlib import Path
 
 import mido
 
-from midi_generator.api import (BackingRules, analyze_midi, extract_rhythm_blueprint,
+from midi_generator.api import (BackingRules, RhythmBlueprint, analyze_midi, extract_rhythm_blueprint,
                                 generate, generate_backing_phrase, render_backing_midi)
 from midi_generator.core.midi_io import load_midi, save_midi
 from midi_generator.modules.guitar.timeline import read_timeline
@@ -80,6 +80,36 @@ def make_job_catalog(master, record, path, section, source_override=None):
     dump(path, job)
 
 
+def section_motif(config, section):
+    """Optional immutable eight-bar motif; legacy drum-led mode stays default.
+
+    Reuse the accepted phrase generator once per section, not once per drum
+    block. Blueprint data is explicit config/provenance, never inferred from
+    a song or altered to fill every kick. Short sections take a prefix.
+    """
+    spec = config.get('guitar_motif')
+    if spec is None:
+        return None
+    if type(spec.get('phrase_bars')) is not int or spec['phrase_bars'] != 8:
+        raise ValueError('guitar_motif.phrase_bars must be 8')
+    values = spec['blueprint']
+    blueprint = RhythmBlueprint(tuple(values['kick_steps']), tuple(values['snare_steps']),
+                                tuple(values['accent_steps']))
+    guitar_config = dict(config['guitar'])
+    duration_mode = guitar_config.pop('duration_mode')
+    root = guitar_config.pop('root'); guitar_config.pop('program')
+    settings = BackingRules(**guitar_config, **section.get('velocities', {}))
+    return generate_backing_phrase(blueprint, note=root, bars=8, rules=settings,
+                                   duration_mode=duration_mode)
+
+
+def motif_slice(motif, local_start_bar, bar_count):
+    """Keep section-local phase through block boundaries, including 8+4 bars."""
+    if not motif:
+        raise ValueError('Expected nonempty motif')
+    return tuple(motif[(local_start_bar + i) % len(motif)] for i in range(bar_count))
+
+
 def build(config, output):
     out = Path(output); out.mkdir(parents=True, exist_ok=True)
     for name in ('guitar.mid', 'bass.mid', 'drums.mid', 'band.mid', 'generation_work'):
@@ -103,6 +133,7 @@ def build(config, output):
     for section in sections:
         section_start, section_end = section['start_beat'], section['end_beat']
         first_g, first_d = len(guitar_notes), len(drum_notes)
+        fixed_motif = section_motif(config, section)
         for block_index, start_beat in enumerate(range(section_start, section_end, 16)):
             length_beats = min(16, section_end - start_beat); block_stop = length_beats * TPB
             source_path = section['drum_sources'][block_index % len(section['drum_sources'])]
@@ -136,7 +167,11 @@ def build(config, output):
             guitar_config = dict(config['guitar']); duration_mode = guitar_config.pop('duration_mode')
             root = guitar_config.pop('root'); program = guitar_config.pop('program')
             settings = BackingRules(**guitar_config, **section.get('velocities', {}))
-            bars = generate_backing_phrase(bp, note=root, bars=req['bars'], rules=settings, duration_mode=duration_mode)
+            if fixed_motif is None:
+                bars = generate_backing_phrase(bp, note=root, bars=req['bars'], rules=settings, duration_mode=duration_mode)
+            else:
+                local_bar = (start_beat - section_start) // 4
+                bars = motif_slice(fixed_motif, local_bar, req['bars'])
             for i, bar in enumerate(bars):
                 # Reuse the accepted renderer and inspect its concrete notes.
                 clip = work / f'{ident}_guitar_bar{i + 1}.mid'
@@ -151,6 +186,9 @@ def build(config, output):
                            'blueprint_warnings': list(bp.warnings), 'guitar_rules': guitar_config,
                            'velocities': section.get('velocities', 'Step7 defaults'),
                            'processing': drum_result.metadata['processing']})
+            if fixed_motif is not None:
+                blocks[-1]['guitar_motif_bar_indices'] = [(local_bar + i) % 8 for i in range(req['bars'])]
+                blocks[-1]['guitar_blueprint_source'] = 'config.guitar_motif (drum blueprint is informational only)'
         relevant = [b for b in ref_map['bars'] if b['start_time'] < config['reference_origin_seconds'] + section_end * 60 / config['reference_bpm']
                     and b['end_time'] > config['reference_origin_seconds'] + section_start * 60 / config['reference_bpm']]
         section_stats.append({**section, 'length_bars': (section_end - section_start) / 4,

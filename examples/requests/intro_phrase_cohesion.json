@@ -1,0 +1,578 @@
+{
+  "bpm": 105,
+  "baseline_root": 52,
+  "allowed_roots": [
+    52,
+    54,
+    55,
+    57,
+    59
+  ],
+  "scale_pitch_classes": [
+    4,
+    6,
+    7,
+    9,
+    11,
+    0,
+    2
+  ],
+  "guitar_note_range": [
+    52,
+    66
+  ],
+  "bass_note_range": [
+    28,
+    35
+  ],
+  "max_jump": 4,
+  "catalog_path": "data/catalog/midi_catalog.json",
+  "drum_source": {
+    "path": "data/sources/drums/metalcore/RoseNuMetal-S04-G01.mid",
+    "sha256": "12a1b2fb65cf7c2c82774e8c6f9de069ed802d729918fcf9033b22c64395be3b"
+  },
+  "drum_seed": 42,
+  "blueprint_source_bars": [
+    0,
+    1
+  ],
+  "power5_steps_by_bar": [
+    [
+      0,
+      3,
+      12,
+      14
+    ],
+    [
+      1,
+      11,
+      13
+    ],
+    [
+      0,
+      3,
+      14
+    ],
+    [
+      1,
+      11,
+      13
+    ],
+    [
+      0,
+      3,
+      12,
+      14
+    ],
+    [
+      1,
+      11,
+      13
+    ],
+    [
+      0,
+      3,
+      14
+    ],
+    [
+      1,
+      11,
+      13
+    ]
+  ],
+  "expected_chord_groups": 26,
+  "A_pitch_assignments": [
+    {
+      "bar": 1,
+      "step": 0,
+      "root": 52
+    },
+    {
+      "bar": 1,
+      "step": 3,
+      "root": 55
+    },
+    {
+      "bar": 1,
+      "step": 6,
+      "root": 54
+    },
+    {
+      "bar": 1,
+      "step": 8,
+      "root": 55
+    },
+    {
+      "bar": 1,
+      "step": 10,
+      "root": 57
+    },
+    {
+      "bar": 1,
+      "step": 12,
+      "root": 59
+    },
+    {
+      "bar": 1,
+      "step": 14,
+      "root": 55
+    },
+    {
+      "bar": 2,
+      "step": 1,
+      "root": 57
+    },
+    {
+      "bar": 2,
+      "step": 2,
+      "root": 55
+    },
+    {
+      "bar": 2,
+      "step": 4,
+      "root": 54
+    },
+    {
+      "bar": 2,
+      "step": 6,
+      "root": 57
+    },
+    {
+      "bar": 2,
+      "step": 11,
+      "root": 55
+    },
+    {
+      "bar": 2,
+      "step": 13,
+      "root": 52
+    },
+    {
+      "bar": 3,
+      "step": 0,
+      "root": 55
+    },
+    {
+      "bar": 3,
+      "step": 3,
+      "root": 57
+    },
+    {
+      "bar": 3,
+      "step": 6,
+      "root": 55
+    },
+    {
+      "bar": 3,
+      "step": 8,
+      "root": 54
+    },
+    {
+      "bar": 3,
+      "step": 10,
+      "root": 57
+    },
+    {
+      "bar": 3,
+      "step": 12,
+      "root": 55
+    },
+    {
+      "bar": 3,
+      "step": 14,
+      "root": 59
+    },
+    {
+      "bar": 4,
+      "step": 1,
+      "root": 59
+    },
+    {
+      "bar": 4,
+      "step": 2,
+      "root": 57
+    },
+    {
+      "bar": 4,
+      "step": 4,
+      "root": 55
+    },
+    {
+      "bar": 4,
+      "step": 6,
+      "root": 54
+    },
+    {
+      "bar": 4,
+      "step": 11,
+      "root": 55
+    },
+    {
+      "bar": 4,
+      "step": 13,
+      "root": 52
+    },
+    {
+      "bar": 5,
+      "step": 0,
+      "root": 52
+    },
+    {
+      "bar": 5,
+      "step": 3,
+      "root": 55
+    },
+    {
+      "bar": 5,
+      "step": 6,
+      "root": 57
+    },
+    {
+      "bar": 5,
+      "step": 8,
+      "root": 59
+    },
+    {
+      "bar": 5,
+      "step": 10,
+      "root": 55
+    },
+    {
+      "bar": 5,
+      "step": 12,
+      "root": 57
+    },
+    {
+      "bar": 5,
+      "step": 14,
+      "root": 55
+    },
+    {
+      "bar": 6,
+      "step": 1,
+      "root": 52
+    },
+    {
+      "bar": 6,
+      "step": 2,
+      "root": 54
+    },
+    {
+      "bar": 6,
+      "step": 4,
+      "root": 55
+    },
+    {
+      "bar": 6,
+      "step": 6,
+      "root": 57
+    },
+    {
+      "bar": 6,
+      "step": 11,
+      "root": 59
+    },
+    {
+      "bar": 6,
+      "step": 13,
+      "root": 55
+    },
+    {
+      "bar": 7,
+      "step": 0,
+      "root": 57
+    },
+    {
+      "bar": 7,
+      "step": 3,
+      "root": 55
+    },
+    {
+      "bar": 7,
+      "step": 6,
+      "root": 54
+    },
+    {
+      "bar": 7,
+      "step": 8,
+      "root": 55
+    },
+    {
+      "bar": 7,
+      "step": 10,
+      "root": 57
+    },
+    {
+      "bar": 7,
+      "step": 12,
+      "root": 55
+    },
+    {
+      "bar": 7,
+      "step": 14,
+      "root": 59
+    },
+    {
+      "bar": 8,
+      "step": 1,
+      "root": 57
+    },
+    {
+      "bar": 8,
+      "step": 2,
+      "root": 55
+    },
+    {
+      "bar": 8,
+      "step": 4,
+      "root": 54
+    },
+    {
+      "bar": 8,
+      "step": 6,
+      "root": 57
+    },
+    {
+      "bar": 8,
+      "step": 11,
+      "root": 55
+    },
+    {
+      "bar": 8,
+      "step": 13,
+      "root": 52
+    }
+  ],
+  "B_seed_assignments": [
+    {
+      "bar": 1,
+      "step": 0,
+      "root": 52
+    },
+    {
+      "bar": 1,
+      "step": 3,
+      "root": 55
+    },
+    {
+      "bar": 1,
+      "step": 6,
+      "root": 54
+    },
+    {
+      "bar": 1,
+      "step": 8,
+      "root": 55
+    },
+    {
+      "bar": 1,
+      "step": 10,
+      "root": 57
+    },
+    {
+      "bar": 1,
+      "step": 12,
+      "root": 55
+    },
+    {
+      "bar": 1,
+      "step": 14,
+      "root": 52
+    },
+    {
+      "bar": 2,
+      "step": 1,
+      "root": 55
+    },
+    {
+      "bar": 2,
+      "step": 2,
+      "root": 54
+    },
+    {
+      "bar": 2,
+      "step": 4,
+      "root": 57
+    },
+    {
+      "bar": 2,
+      "step": 6,
+      "root": 59
+    },
+    {
+      "bar": 2,
+      "step": 11,
+      "root": 55
+    },
+    {
+      "bar": 2,
+      "step": 13,
+      "root": 52
+    }
+  ],
+  "C_response_assignments": [
+    {
+      "bar": 3,
+      "step": 0,
+      "root": 55
+    },
+    {
+      "bar": 3,
+      "step": 3,
+      "root": 57
+    },
+    {
+      "bar": 3,
+      "step": 6,
+      "root": 55
+    },
+    {
+      "bar": 3,
+      "step": 8,
+      "root": 54
+    },
+    {
+      "bar": 3,
+      "step": 10,
+      "root": 55
+    },
+    {
+      "bar": 3,
+      "step": 12,
+      "root": 57
+    },
+    {
+      "bar": 3,
+      "step": 14,
+      "root": 55
+    },
+    {
+      "bar": 4,
+      "step": 1,
+      "root": 57
+    },
+    {
+      "bar": 4,
+      "step": 2,
+      "root": 55
+    },
+    {
+      "bar": 4,
+      "step": 4,
+      "root": 54
+    },
+    {
+      "bar": 4,
+      "step": 6,
+      "root": 55
+    },
+    {
+      "bar": 4,
+      "step": 11,
+      "root": 57
+    },
+    {
+      "bar": 4,
+      "step": 13,
+      "root": 55
+    },
+    {
+      "bar": 7,
+      "step": 0,
+      "root": 52
+    },
+    {
+      "bar": 7,
+      "step": 3,
+      "root": 55
+    },
+    {
+      "bar": 7,
+      "step": 6,
+      "root": 57
+    },
+    {
+      "bar": 7,
+      "step": 8,
+      "root": 59
+    },
+    {
+      "bar": 7,
+      "step": 10,
+      "root": 57
+    },
+    {
+      "bar": 7,
+      "step": 12,
+      "root": 55
+    },
+    {
+      "bar": 7,
+      "step": 14,
+      "root": 57
+    },
+    {
+      "bar": 8,
+      "step": 1,
+      "root": 59
+    },
+    {
+      "bar": 8,
+      "step": 2,
+      "root": 57
+    },
+    {
+      "bar": 8,
+      "step": 4,
+      "root": 55
+    },
+    {
+      "bar": 8,
+      "step": 6,
+      "root": 54
+    },
+    {
+      "bar": 8,
+      "step": 11,
+      "root": 55
+    },
+    {
+      "bar": 8,
+      "step": 13,
+      "root": 52
+    }
+  ],
+  "protected_audition_sources": [
+    {
+      "path": "output/phase9_step3_motif_variations/chorus_B_repetition.mid",
+      "sha256": "05c67618573339acd37d3d3a41f44f15c3f04c9c9ae6fd26bb04b06a07e63fa1"
+    },
+    {
+      "path": "output/phase9_step6_pitch_variations/chorus_C_expanded_pitch.mid",
+      "sha256": "dc8887fbd99c10176cc070da9010bee9b6ad078ef39f2d2b53d6835ba50a7aa4"
+    },
+    {
+      "path": "output/phase9_step8_chord_voicing/chorus_C_balanced.mid",
+      "sha256": "af2f4e3fca9bbe0ccf68968fad587974375b205b8b88b0133a2f1cf41f136f34"
+    },
+    {
+      "path": "output/phase9_step9_duration_variations/chorus_C_contrast.mid",
+      "sha256": "aeb9f8fd866275e793513b5e14b6aeb143c5c354e23b1a997a13c7f109c0043f"
+    }
+  ],
+  "chorus_comparison": {
+    "path": "output/phase9_step9_duration_variations/guitar_C_contrast.mid",
+    "sha256": "659247cce3cdc8914a8d2611b5dde0cf2ebb94455dfb27a3a841a675cb75cf1f"
+  },
+  "preference_record": "Step9-C preferred. Preserve earlier audition baselines; no automatic default adoption.",
+  "arrangement_notes": [
+    "Fresh drum API generation using a one-record temporary task catalog; master tags unchanged.",
+    "Guitar alternates the first two valid drum Blueprint patterns, generated by existing phase4 rule API.",
+    "Common voicing26/52=50%, short weak gates and accent/ending long gates inspired by Step9-C contrast, not copied Chorus events.",
+    "All candidates begin on root52 at tick0 and end on root52 with a quarter-beat breath before the next section.",
+    "A has independent hand-designed active contours, no intentional 1-2 ->5-6 unification. No Chorus root sequence copied.",
+    "B transfers pitches by local rhythmic position, not event ordinal; unmatched positions retain explicit draft role pitches.",
+    "C changes bars3-4 and7-8 only after B unification, returning to the seed at5-6.",
+    "All first-two-bar pitch motifs use the same five allowed roots; cohesion comparison does not reduce motif pitch variety."
+  ]
+}

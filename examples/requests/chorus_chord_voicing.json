@@ -1,0 +1,63 @@
+{
+  "sources": {
+    "guitar": {
+      "path": "output/phase9_step7_pitch_density/guitar_A_step6C.mid",
+      "sha256": "ad248ce34667a66f53665f98ac10af957cc5decb6d0f0d22a496523a4a375222"
+    },
+    "bass": {
+      "path": "output/phase9_step7_pitch_density/bass_A_step6C.mid",
+      "sha256": "2c2b24cf5094ef1fe2ce17e33743e6adbb9c7fc6e57fb9bc1e9f951f688651d6"
+    },
+    "band": {
+      "path": "output/phase9_step7_pitch_density/chorus_A_step6C.mid",
+      "sha256": "dc8887fbd99c10176cc070da9010bee9b6ad078ef39f2d2b53d6835ba50a7aa4"
+    },
+    "drums": {
+      "path": "output/phase9_step7_pitch_density/drums_shared.mid",
+      "sha256": "5e1e1ec371970c7199ee90ba4495b88c6b96155f4b4d71dc1f2dabdf13f04c38"
+    }
+  },
+  "scale_pitch_classes": [
+    4,
+    6,
+    7,
+    9,
+    11,
+    0,
+    2
+  ],
+  "guitar_note_range": [
+    52,
+    66
+  ],
+  "export_bpm": 105,
+  "expected_original_power5_count": 46,
+  "chord_counts": {
+    "B": 14,
+    "C": 30,
+    "D": 46
+  },
+  "C_first_four_bar_chord_counts": [
+    4,
+    4,
+    6,
+    1
+  ],
+  "strong_velocity_threshold": 96,
+  "kick_tolerance_beats": 0.04,
+  "drum_mapping_config": "config/guitar_sync.json",
+  "target_B_power5_ratio": 0.25,
+  "actual_B_reason": "Pairing every composition position across first/last four bars requires even chord totals; choose lower nearest 14 rather than 15 to prioritize single focus.",
+  "D_policy": "Rank phrase ends, strong velocity, bar starts, mapped kick coincidence and quarter beats. Count remains 46; not all chords can be strong accents.",
+  "role_score_weights": {
+    "phrase_end": 10000,
+    "velocity_at_least_96": 1000,
+    "bar_start": 300,
+    "kick_match": 100,
+    "quarter_beat": 80,
+    "pickup_before_major_accent": 150
+  },
+  "preference_record": "Step 7-A / Step 6-C pitch and Step 3-B rhythm are the current preferred baseline. No new candidate is adopted.",
+  "major_velocity_threshold": 100,
+  "pickup_max_gap_steps": 2
+}

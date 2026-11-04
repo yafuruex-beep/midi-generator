@@ -86,6 +86,9 @@
       },
       "additionalProperties": false
     },
+    "riff_style": {
+      "enum": ["chord_driven", "stop_and_go", "tight_groove", "stutter_breakdown", "groove_burst"]
+    },
     "options": {
       "type": "object"
     },
