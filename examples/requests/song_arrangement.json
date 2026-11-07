@@ -1,0 +1,52 @@
+{
+  "bpm": 125,
+  "key": "E minor",
+  "catalog": "data/catalog/midi_catalog.json",
+  "sections": [
+    {
+      "id": "intro",
+      "bars": 8,
+      "style": "tight_groove",
+      "guitar_seed": 401,
+      "drum_seed": 401,
+      "drum_source": "data/sources/drums/metalcore/RoseNuMetal-S09-G03.mid",
+      "drum_sha256": "ef2a88e9a33ee218eb83823d5543d2ce11a9bc95b471a2b6069f08969b0d0b09"
+    },
+    {
+      "id": "verse",
+      "bars": 16,
+      "style": "stop_and_go",
+      "guitar_seed": 402,
+      "drum_seed": 401,
+      "drum_source": "data/sources/drums/metalcore/RoseNuMetal-S09-G03.mid",
+      "drum_sha256": "ef2a88e9a33ee218eb83823d5543d2ce11a9bc95b471a2b6069f08969b0d0b09"
+    },
+    {
+      "id": "chorus",
+      "bars": 8,
+      "style": "chord_driven",
+      "guitar_seed": 403,
+      "drum_seed": 401,
+      "drum_source": "data/sources/drums/metalcore/RoseNuMetal-S09-G03.mid",
+      "drum_sha256": "ef2a88e9a33ee218eb83823d5543d2ce11a9bc95b471a2b6069f08969b0d0b09"
+    },
+    {
+      "id": "breakdown",
+      "bars": 8,
+      "style": "stutter_breakdown",
+      "guitar_seed": 404,
+      "drum_seed": 401,
+      "drum_source": "data/sources/drums/metalcore/RoseNuMetal-S10-G05.mid",
+      "drum_sha256": "cce393bd985f758bf61312d0d95d11027510805ec093953e7aa4fdbffb40e93a"
+    },
+    {
+      "id": "outro",
+      "bars": 8,
+      "style": "groove_burst",
+      "guitar_seed": 405,
+      "drum_seed": 401,
+      "drum_source": "data/sources/drums/metalcore/RoseNuMetal-S09-G03.mid",
+      "drum_sha256": "ef2a88e9a33ee218eb83823d5543d2ce11a9bc95b471a2b6069f08969b0d0b09"
+    }
+  ]
+}

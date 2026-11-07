@@ -44,6 +44,9 @@ from midi_generator.storage.guitar_riffs import analyze_catalog_guitars, get_gui
 from midi_generator.storage.guitar_migration import reconcile_guitar_sources, recover_guitar_references
 
 
+from midi_generator.reference_midi import analyze_reference_midi, save_reference_midi_analysis
+
+
 def inspect(path: str | Path) -> dict[str, Any]:
     """Inspect a Standard MIDI File."""
     return inspect_midi(path)
@@ -85,6 +88,7 @@ def generate(
 
 
 __all__ = [
+    "analyze_reference_midi", "save_reference_midi_analysis",
     "RhythmBlueprint", "BackingRules", "BackingStep", "develop_backing_motif",
     "extract_rhythm_blueprint", "generate_backing_steps", "generate_backing_phrase", "render_backing_midi",
     "GenerationRequest",

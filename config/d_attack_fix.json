@@ -1,0 +1,9 @@
+{
+  "guitar": "output/phase12_step2_eight_bar_composition/pattern_d_breakdown_8bars.mid",
+  "band": "output/phase12_step3_drum_guitar_sync/pattern_d_drums_guitar_8bars.mid",
+  "step3_directory": "output/phase12_step3_drum_guitar_sync",
+  "bars": [2,4,6],
+  "note": 47,
+  "duration_beats": 0.25,
+  "velocity_rule": "match unchanged first existing B attack in each bar"
+}

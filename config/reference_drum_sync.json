@@ -1,0 +1,17 @@
+{
+  "input": "data/references/09 The Grey.mp3",
+  "step2_directory": "output/phase12_step2_eight_bar_composition",
+  "bpm": 95,
+  "seed": 42,
+  "tail_seconds": 1.0,
+  "mapping": {
+    "kick": 36,
+    "snare": 38,
+    "closed_hat": 42,
+    "open_hat": 46,
+    "crash": 49
+  },
+  "mapping_provenance": "GM_DRUM_MAP and config/drum_groove.json; original composed percussion on channel 10",
+  "guitar_changes": "none",
+  "tail_fade_seconds": 0.1
+}

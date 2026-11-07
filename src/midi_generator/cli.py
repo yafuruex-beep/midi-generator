@@ -53,6 +53,13 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
     reference_parser = subparsers.add_parser("reference", help="Read-only reference audio analysis")
     reference_subparsers = reference_parser.add_subparsers(dest="reference_command", required=True)
+    reference_midi = reference_subparsers.add_parser("analyze-midi", help="Analyze user-transcribed MIDI parts")
+    reference_midi.add_argument("midi_path")
+    reference_midi.add_argument("--guitar-tracks", nargs="+", type=int, required=True, help="Zero-based MIDI track indices")
+    reference_midi.add_argument("--drum-tracks", nargs="+", type=int, default=[])
+    reference_midi.add_argument("--sections", help="Optional section definitions JSON")
+    reference_midi.add_argument("--sync-config", help="Optional existing guitar sync mapping JSON")
+    reference_midi.add_argument("--output", default="output/phase11_step1_reference_analysis", help="New report directory")
     reference_analyze = reference_subparsers.add_parser("analyze", help="Analyze WAV/MP3/FLAC rhythm features and save JSON")
     reference_analyze.add_argument("audio_path", help="Existing input audio file")
     reference_analyze.add_argument("--start", type=float, default=0.0, help="Start seconds (default 0)")
@@ -225,7 +232,14 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     args = build_parser().parse_args()
     try:
-        if args.command == "reference" and args.reference_command == "plan":
+        if args.command == "reference" and args.reference_command == "analyze-midi":
+            from midi_generator.reference_midi import analyze_reference_midi, save_reference_midi_analysis
+            result = analyze_reference_midi(args.midi_path, guitar_tracks=args.guitar_tracks,
+                                           drum_tracks=args.drum_tracks, sections=args.sections,
+                                           sync_config_path=args.sync_config)
+            saved = save_reference_midi_analysis(result, args.output)
+            print(json.dumps({"output_files": [str(path) for path in saved]}, ensure_ascii=False))
+        elif args.command == "reference" and args.reference_command == "plan":
             from midi_generator.planning import create_reference_generation_plan, save_reference_generation_plan
             with Path(args.config).open(encoding="utf-8") as stream:
                 request = json.load(stream)

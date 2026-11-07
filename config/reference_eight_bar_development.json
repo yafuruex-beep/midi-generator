@@ -1,0 +1,13 @@
+{
+  "input": "data/references/09 The Grey.mp3",
+  "step1_directory": "output/phase12_step1_reference_audio_composition",
+  "bpm": 95,
+  "key": "B minor",
+  "bar_origin_seconds": 1.287157894736842,
+  "grid_label": "C",
+  "meter_hypothesis": [4, 4],
+  "seed": 42,
+  "patterns": ["c", "d"],
+  "drum_source": null,
+  "user_evaluation": {"c": [3,4,4,4,4], "d": [4,4,4,3,4]}
+}

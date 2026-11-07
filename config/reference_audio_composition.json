@@ -1,0 +1,12 @@
+{
+  "input": "data/references/09 The Grey.mp3",
+  "bpm": 95,
+  "key": "B minor",
+  "bar_origin_seconds": 1.287157894736842,
+  "grid_label": "C",
+  "meter_hypothesis": [4, 4],
+  "bars": 4,
+  "candidate_bar_indices": [49, 51, 53],
+  "seed": 42,
+  "verification": {"bpm": "user_verified", "key": "user_verified", "grid": "user_adopted", "meter": "hypothesis"}
+}
